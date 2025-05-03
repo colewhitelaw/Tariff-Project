@@ -1059,7 +1059,6 @@ def update_import_share_explanation(selected_countries):
 )
 def update_treemap(selected_year):
     try:
-        print(f"Selected year: {selected_year}")
         filtered_df = product_group_df[product_group_df['Year'] == selected_year].copy()
         if filtered_df.empty or filtered_df['Percent of Imports'].sum() == 0:
             fig = go.Figure()
@@ -1104,22 +1103,19 @@ def update_treemap(selected_year):
         has_tariff_rates = all(col in filtered_df.columns for col in ['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate'])
         root_label = "US Imports"
         categories = filtered_df['Category'].unique().tolist()
-        category_labels = [f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)" for cat in categories]
+        # Build category label mapping for exact match
+        category_label_map = {cat: f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)" for cat in categories}
+        category_labels = [category_label_map[cat] for cat in categories]
         product_labels = filtered_df['Product Group'].tolist()
         labels = [root_label] + category_labels + product_labels
-        parents = [''] + [root_label]*len(category_labels) + [f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)" for cat in filtered_df['Category']]
-        # Only assign values to product group nodes (leaf nodes)
+        parents = [''] + [root_label]*len(category_labels) + [category_label_map[cat] for cat in filtered_df['Category']]
         values = [None]*(1+len(category_labels)) + filtered_df['Percent for Treemap'].tolist()
-        # Only assign colors to product group nodes
         colors_arr = [None]*(1+len(category_labels)) + filtered_df['Percent of Imports'].tolist()
-        # Only assign customdata to product group nodes
         if has_tariff_rates:
             customdata_arr = [None]*(1+len(category_labels)) + filtered_df[['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate']].values.tolist()
         else:
             customdata_arr = [None]*(1+len(category_labels)) + [[None, None]]*len(product_labels)
-        # Only assign text to product group nodes
         text_arr = ['']*(1+len(category_labels)) + filtered_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%").tolist()
-        # Conditional hovertemplate
         hovertemplate_arr = ['<b>%{label}</b><extra></extra>']*(1+len(category_labels))
         if has_tariff_rates:
             hovertemplate_arr += ["<b>%{label}</b><br>Import: %{text}<br>MFN Tariff: %{customdata[0]:.1f}%<br>Bound Tariff: %{customdata[1]:.1f}%<extra></extra>"]*len(product_labels)
