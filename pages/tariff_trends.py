@@ -442,16 +442,38 @@ def render_tab_content(tab):
             dbc.Row([
                 dbc.Col([
                     dbc.Card([
-                        dbc.CardHeader("US Import Distribution by Product Group", className="bg-primary text-white"),
+                        dbc.CardHeader("US Imports Distribution", className="bg-primary text-white", 
+                                      style={'border-radius': '0.375rem 0.375rem 0 0'}),
                         dbc.CardBody([
                             dcc.Graph(
                                 id='import-treemap', 
-                                style={'height': '800px'}  # Increased height for better visibility
+                                style={
+                                    'height': '800px',
+                                    'width': '100%',
+                                    'backgroundColor': '#212529'
+                                },
+                                config={
+                                    'displayModeBar': False,  # Hide the mode bar completely
+                                    'responsive': True
+                                }
                             )
-                        ], className="p-0")
-                    ], className="shadow")
-                ], width=12)
-            ], className="mb-4"),
+                        ], className="p-0", style={
+                            'backgroundColor': '#212529', 
+                            'border': 'none',
+                            'padding': '0',
+                            'margin': '0',
+                            'overflow': 'hidden',
+                            'borderRadius': '0 0 0.375rem 0.375rem'
+                        })
+                    ], className="shadow", style={
+                        'backgroundColor': '#212529', 
+                        'border': 'none',
+                        'padding': '0',
+                        'overflow': 'hidden',
+                        'borderRadius': '0.375rem'
+                    })
+                ], width=12, style={'padding': '0'})
+            ], className="mb-4", style={'margin': '0 0 1rem 0', 'padding': '0'}),
             
             # Statistics section
             dbc.Card([
@@ -1051,7 +1073,7 @@ def update_import_share_explanation(selected_countries):
     ]
     return share_text
 
-# Add treemap callback after all other callbacks
+# ==== Product Treemap Tab Callbacks ====
 @callback(
     [Output('import-treemap', 'figure'),
      Output('product-stats', 'children')],
@@ -1308,7 +1330,8 @@ def update_treemap(selected_year):
             selected_year_int = int(selected_year)
         except (ValueError, TypeError):
             selected_year_int = 2022  # Default to 2022 if conversion fails
-        
+        print('DEBUG: selected_year_int used for treemap:', selected_year_int)
+
         # Default to closest available year if selected year is not in the dataset
         if selected_year_int not in hard_coded_data:
             available_years = sorted(list(hard_coded_data.keys()))
@@ -1319,62 +1342,183 @@ def update_treemap(selected_year):
             else:
                 # Find the closest year
                 selected_year_int = min(available_years, key=lambda x: abs(x - selected_year_int))
-        
+        print('DEBUG: selected_year_int after adjustment:', selected_year_int)
+
         # Get data for selected year
         year_data = hard_coded_data[selected_year_int]
+
+        # Print debug information to understand the data
+        print(f"DEBUG: Raw data for year {selected_year_int}:")
+        for item in year_data[:3]:  # Print first 3 items as sample
+            print(f"  {item}")
         
-        # Validate data
-        if not year_data or len(year_data) == 0:
-            raise ValueError("No data available for selected year")
-        
-        # Add root element to each item for hierarchical structure
+        # Ensure all data has proper category and product group values
         for item in year_data:
-            item["Root"] = "US Imports"
+            if 'Category' not in item or not item['Category']:
+                item['Category'] = 'Uncategorized'
+            if 'Product Group' not in item or not item['Product Group']:
+                item['Product Group'] = 'Other Products'
+            if 'Percent of Imports' not in item or not isinstance(item['Percent of Imports'], (int, float)):
+                item['Percent of Imports'] = 0.0
+
+        # Convert to DataFrame for easier processing
+        import pandas as pd
+        df = pd.DataFrame(year_data)
         
-        # Create the treemap using plotly express
-        fig = px.treemap(
-            year_data,
-            path=['Root', 'Category', 'Product Group'],
-            values='Percent of Imports',
-            color='Percent of Imports',
-            color_continuous_scale=[[0, '#e3f2fd'], [0.5, '#64b5f6'], [1, '#1976d2']],
-            title=f'US Import Distribution by Product Group ({selected_year_int})'
-        )
+        # Fallback: if df is empty, show a message
+        if df.empty:
+            fig = go.Figure()
+            fig.add_annotation(
+                text='No data available for this year or data is malformed.',
+                xref='paper', yref='paper',
+                x=0.5, y=0.5, showarrow=False,
+                font=dict(size=20, color='red')
+            )
+            fig.update_layout(
+                title='US Import Distribution by Product Group',
+                height=800,
+                plot_bgcolor='#212529',
+                paper_bgcolor='#212529'
+            )
+            stats_html = html.Div(
+                'No data available for this year or data is malformed.',
+                style={'textAlign': 'center', 'padding': '50px', 'color': 'red', 'fontSize': '20px'}
+            )
+            return fig, stats_html
         
-        # Update layout - remove coloraxis_showscale to hide the heatbar legend
-        fig.update_layout(
-            margin=dict(t=60, l=25, r=25, b=25),
-            title_font=dict(size=24, color='#ffffff', family='Roboto'),
-            paper_bgcolor='#212529',
-            font=dict(family='Roboto', size=14, color='#ffffff'),
-            coloraxis_showscale=False  # Hide the heatbar legend
-        )
+        # Debug output to verify the DataFrame is correct
+        print(f"DEBUG: Data for {selected_year_int}:")
+        print(df[['Category', 'Product Group', 'Percent of Imports']].head())
+        print(f"Total categories: {df['Category'].nunique()}")
+        print(f"Category sums:")
+        for category in df['Category'].unique():
+            cat_sum = df[df['Category'] == category]['Percent of Imports'].sum()
+            print(f"  {category}: {cat_sum:.1f}%")
         
-        # Simplify trace updates with reliable text coloring
-        fig.update_traces(
-            hovertemplate='<b>%{label}</b><br>%{value:.1f}%<extra></extra>',
-            textinfo='label+percent entry',
-            textfont=dict(size=14, color='black', family='Roboto', weight='bold'),
+        print(f"Technology category value: {df[df['Category'] == 'Technology']['Percent of Imports'].sum():.1f}%")
+        print(f"Electrical machinery value: {df[df['Product Group'] == 'Electrical machinery and electronic equipment']['Percent of Imports'].iloc[0] if not df[df['Product Group'] == 'Electrical machinery and electronic equipment'].empty else 'Not found'}%")
+        
+        # Process DataFrame to prepare for treemap
+        # Create a more structured DataFrame with both levels of hierarchy
+        # First get category totals
+        category_totals = df.groupby('Category')['Percent of Imports'].sum().reset_index()
+        
+        # Create entry for each category (parent level)
+        treemap_data = []
+        for _, cat_row in category_totals.iterrows():
+            treemap_data.append({
+                'id': cat_row['Category'],
+                'parent': '',
+                'label': cat_row['Category'].upper(),
+                'value': cat_row['Percent of Imports']
+            })
+            
+            # Add product entries for this category (child level)
+            category_products = df[df['Category'] == cat_row['Category']]
+            for _, prod_row in category_products.iterrows():
+                prod_id = f"{cat_row['Category']}_{prod_row['Product Group']}"
+                treemap_data.append({
+                    'id': prod_id,
+                    'parent': cat_row['Category'],
+                    'label': prod_row['Product Group'],
+                    'value': prod_row['Percent of Imports']
+                })
+        
+        # Convert to DataFrame
+        treemap_df = pd.DataFrame(treemap_data)
+        
+        # Debug output
+        print("DEBUG: Treemap data structure:")
+        print(treemap_df.head(10))
+
+        # Process data to create scaled text sizes based on values
+        # Scale font sizes based on the percentage value
+        def get_font_size(value):
+            # Base size is 12, max is 18, scale logarithmically between them
+            import math
+            if value < 0.5:  # Very small values get minimum size
+                return 8
+            elif value < 1:
+                return 10
+            elif value < 3:
+                return 12
+            elif value < 10:
+                return 14
+            else:
+                return 16
+        
+        # Add font size column to dataframe for scaling
+        treemap_df['font_size'] = treemap_df['value'].apply(get_font_size)
+        
+        # Create a simpler treemap with basic, functional text display
+        fig = go.Figure(go.Treemap(
+            ids=treemap_df['id'],
+            labels=treemap_df['label'],
+            parents=treemap_df['parent'],
+            values=treemap_df['value'],
+            branchvalues='total',
+            # Simple text format
+            text=treemap_df['label'] + '<br>' + treemap_df['value'].apply(lambda x: f"{x:.1f}%"),
+            hovertemplate='<b>%{label}</b><br>%{value:.1f}% of Imports<extra></extra>',
+            # Configure tile settings
+            tiling=dict(
+                packing='squarify',
+                pad=2
+            ),
+            # Add pathbar for easier navigation
+            pathbar=dict(
+                visible=True,
+                side='top',
+                thickness=20
+            ),
             marker=dict(
-                line=dict(width=1, color='#212529')
+                line=dict(width=1.5, color='#000000'),
+                colors=[
+                    '#2b6cb0' if row['id'] == 'Technology' or row['parent'] == 'Technology' else
+                    '#38b2ac' if row['id'] == 'Industrial' or row['parent'] == 'Industrial' else
+                    '#dd6b20' if row['id'] == 'Agricultural' or row['parent'] == 'Agricultural' else
+                    '#805ad5' if row['id'] == 'Raw Materials' or row['parent'] == 'Raw Materials' else
+                    '#3182ce' if row['id'] == 'Other' or row['parent'] == 'Other' else
+                    '#90cdf4'  # Default color
+                    for _, row in treemap_df.iterrows()
+                ]
+            ),
+            textinfo="text",
+            textposition="middle center",
+            textfont=dict(
+                family="Arial",
+                size=12,
+                color="white"
+            )
+        ))
+        
+        # Update layout with simplified settings
+        fig.update_layout(
+            margin=dict(t=70, l=20, r=20, b=20),  # More top margin for pathbar
+            paper_bgcolor='#212529',
+            plot_bgcolor='#212529',
+            font=dict(
+                family='Arial', 
+                size=14, 
+                color='white'
+            ),
+            height=800,
+            hoverlabel=dict(
+                bgcolor="rgba(10, 20, 30, 0.95)",
+                font_size=16,
+                font_family="Arial",
+                font_color="#ffffff"
             )
         )
         
         # Prepare statistics
-        # Calculate category totals
-        categories = {}
-        for item in year_data:
-            category = item["Category"]
-            if category not in categories:
-                categories[category] = 0
-            categories[category] += item["Percent of Imports"]
+        # Calculate category totals using the DataFrame
+        category_totals = df.groupby('Category')['Percent of Imports'].sum().reset_index()
+        category_totals = category_totals.sort_values('Percent of Imports', ascending=False)
         
-        # Sort categories by total
-        sorted_categories = sorted(categories.items(), key=lambda x: x[1], reverse=True)
-        
-        # Sort products by percent
-        sorted_products = sorted(year_data, key=lambda x: x["Percent of Imports"], reverse=True)
-        top_products = sorted_products[:5]
+        # Get top products directly from the DataFrame
+        product_totals = df.sort_values('Percent of Imports', ascending=False)
+        top_products = product_totals.head(5)
         
         # Table styling
         table_header_style = {
@@ -1417,23 +1561,23 @@ def update_treemap(selected_year):
             'boxShadow': '0 4px 12px rgba(0, 0, 0, 0.3)'
         }
         
-        # Create category rows
+        # Create category rows from DataFrame
         category_rows = []
-        for category, total in sorted_categories:
+        for _, row in category_totals.iterrows():
             category_rows.append(
                 html.Tr([
-                    html.Td(category, style=table_cell_style), 
-                    html.Td(f"{total:.1f}%", style=percent_cell_style)
+                    html.Td(row['Category'], style=table_cell_style), 
+                    html.Td(f"{row['Percent of Imports']:.1f}%", style=percent_cell_style)
                 ], style={'hover': {'backgroundColor': '#2d3748'}})
             )
         
-        # Create product rows
+        # Create product rows from DataFrame
         product_rows = []
-        for product in top_products:
+        for _, row in top_products.iterrows():
             product_rows.append(
                 html.Tr([
-                    html.Td(product["Product Group"], style=table_cell_style), 
-                    html.Td(f"{product['Percent of Imports']:.1f}%", style=percent_cell_style)
+                    html.Td(row['Product Group'], style=table_cell_style), 
+                    html.Td(f"{row['Percent of Imports']:.1f}%", style=percent_cell_style)
                 ], style={'hover': {'backgroundColor': '#2d3748'}})
             )
         
@@ -1648,11 +1792,42 @@ def update_share_layout(fig):
 # Update the treemap layout
 def update_treemap_layout(fig):
     fig.update_layout(
-        margin=dict(t=60, l=25, r=25, b=25),
+        margin=dict(t=40, l=0, r=0, b=0),  # Top margin for pathbar
         coloraxis_showscale=False,
-        title_font=dict(size=24, color='#ffffff', family='Roboto'),
+        title=None,  # Remove title completely
         paper_bgcolor='#212529',
+        plot_bgcolor='#212529',
         separators='.',
-        font=dict(family='Roboto', size=14, color='#ffffff')
+        font=dict(family='Roboto', size=14, color='#ffffff'),
+        dragmode=False,  # Disable drag interactions that can show borders
+        autosize=True,   # Make sure it fills the container
+        width=None,      # Let it expand to container width
+        uniformtext=dict(minsize=8, mode='show'),  # Show text even in small sections
+        hoverlabel=dict(
+            bgcolor="rgba(26, 54, 93, 0.95)",
+            font_size=16,
+            font_family="Roboto",
+            font_color="#ffffff",
+            bordercolor="#4299e1",
+            namelength=-1
+        )
     )
+    
+    # Update the traces directly for better control
+    fig.update_traces(
+        marker=dict(
+            line=dict(width=2, color='#1e293b'),  # Slightly thicker borders for sections
+            pad=dict(t=2, r=2, b=2, l=2)  # Moderate padding to distinguish sections
+        ),
+        insidetextfont=dict(
+            size=10,  # Smaller font size for better fit in small sections
+            color='#ffffff', 
+            family='Roboto Bold'
+        ),
+        texttemplate='<span style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0px 0px 4px #000000;">%{label}<br>%{percentParent:.1f}%</span>',
+        textposition='middle center',
+        hovertemplate='<b>%{label}</b><br><b>Value:</b> %{value:.1f}%<br><b>Percentage:</b> %{percentRoot:.1f}% of total<extra></extra>',
+        pathbar=dict(visible=True, side='top', thickness=20)  # Ensure pathbar is visible
+    )
+    
     return fig
