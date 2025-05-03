@@ -1061,17 +1061,17 @@ def update_treemap(selected_year):
     try:
         # Ensure selected_year is an integer
         selected_year = int(selected_year)
-        print(f"Selected year: {selected_year}, type: {type(selected_year)}")
         
-        # Debug DataFrame year column
-        print(f"Product group DataFrame years: {product_group_df['Year'].unique()}")
-        print(f"Year column type: {product_group_df['Year'].dtype}")
+        # Create a copy of the DataFrame before any operations
+        df_copy = product_group_df.copy()
         
-        # Explicitly convert Year column to integer to ensure comparison works
-        product_group_df['Year'] = product_group_df['Year'].astype(int)
+        # Explicitly convert Year column to integer
+        df_copy['Year'] = df_copy['Year'].astype(int)
         
-        # Filter data for selected year
-        filtered_df = product_group_df[product_group_df['Year'] == selected_year].copy()
+        # Filter data for selected year - avoid chained operations
+        mask = df_copy['Year'] == selected_year
+        filtered_df = df_copy[mask].copy()
+        
         print(f"Filtered DataFrame has {len(filtered_df)} rows for year {selected_year}")
         
         # Check if we have data
@@ -1115,11 +1115,18 @@ def update_treemap(selected_year):
                     if product_group in products:
                         return category
                 return 'Other'
+            # Apply without chaining
             filtered_df['Category'] = filtered_df['Product Group'].apply(assign_category)
+        
+        # Create a copy with the calculated fields
+        plot_df = filtered_df.copy()
+        
+        # Handle percentage formatting safely
+        plot_df['Percent for Plot'] = plot_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%")
         
         # Create basic treemap
         fig = px.treemap(
-            filtered_df,
+            plot_df,
             path=['Category', 'Product Group'],
             values='Percent of Imports',
             color='Percent of Imports',
@@ -1127,13 +1134,13 @@ def update_treemap(selected_year):
             hover_data={
                 'Percent of Imports': ':.1f%'
             },
-            custom_data=['Percent of Imports'],
+            custom_data=['Percent for Plot'],
             title=f'US Import Distribution by Product Group ({selected_year})'
         )
         
         # Set hovertemplate to only show percentage of imports
         fig.update_traces(
-            hovertemplate='<b>%{label}</b><br>%{customdata[0]:.1f}%<extra></extra>'
+            hovertemplate='<b>%{label}</b><br>%{customdata[0]}<extra></extra>'
         )
         
         # Update layout
@@ -1145,9 +1152,11 @@ def update_treemap(selected_year):
             font=dict(family='Roboto', size=14, color='#ffffff')
         )
         
-        # Statistics for tables
-        top_categories = filtered_df.groupby('Category')['Percent of Imports'].sum().sort_values(ascending=False)
-        top_products = filtered_df.sort_values('Percent of Imports', ascending=False).head(5)
+        # Statistics for tables - avoid chained operations
+        grouped = filtered_df.groupby('Category')['Percent of Imports'].sum()
+        top_categories = grouped.sort_values(ascending=False)
+        sorted_df = filtered_df.sort_values('Percent of Imports', ascending=False)
+        top_products = sorted_df.head(5)
         
         # Styling for tables
         table_header_style = {
