@@ -1058,184 +1058,208 @@ def update_import_share_explanation(selected_countries):
     [Input('treemap-year-slider', 'value')]
 )
 def update_treemap(selected_year):
-    # Filter data by selected year
-    filtered_df = product_group_df[product_group_df['Year'] == selected_year].copy()
-    
-    # Check if we have valid data for this year
-    if filtered_df.empty or filtered_df['Percent of Imports'].sum() == 0:
-        # Create an empty figure with a message
-        fig = go.Figure()
-        fig.add_annotation(
-            text=f"No import data available for {selected_year}",
-            xref="paper", yref="paper",
-            x=0.5, y=0.5, showarrow=False,
-            font=dict(size=30, color=colors['dark_blue'])
+    try:
+        # Filter data by selected year
+        filtered_df = product_group_df[product_group_df['Year'] == selected_year].copy()
+        
+        # Check if we have valid data for this year
+        if filtered_df.empty or filtered_df['Percent of Imports'].sum() == 0:
+            # Create an empty figure with a message
+            fig = go.Figure()
+            fig.add_annotation(
+                text=f"No import data available for {selected_year}",
+                xref="paper", yref="paper",
+                x=0.5, y=0.5, showarrow=False,
+                font=dict(size=30, color=colors['dark_blue'])
+            )
+            
+            # Add a border to make it look like a chart
+            fig.update_layout(
+                title=f'US Import Distribution by Product Group ({selected_year})',
+                title_font_color=colors['dark_blue'],
+                title_font_size=30,
+                height=800,
+                plot_bgcolor='rgba(45, 45, 45, 0.5)',
+                paper_bgcolor=colors['card']
+            )
+            
+            # Return empty stats
+            stats_html = html.Div("No data available for the selected year", 
+                                style={'textAlign': 'center', 'padding': '50px', 'color': colors['dark_blue'], 'fontSize': '24px'})
+            return fig, stats_html
+        
+        # Classify products into categories for the treemap hierarchy
+        product_categories = {
+            'Agricultural': ['Live animals and meat', 'Dairy products', 'Fruits and vegetables', 
+                            'Coffee, tea, cocoa and spices', 'Cereals and food preparations', 
+                            'Oilseeds, fats and oils', 'Sugars and confectionery', 
+                            'Beverages and tobacco', 'Cotton, silk and wool', 
+                            'Other agricultural products', 'Fish and fish products'],
+            'Raw Materials': ['Minerals and metals', 'Petroleum'],
+            'Industrial': ['Chemicals', 'Wood, paper, furniture', 'Textiles', 'Rubber, leather and footwear'],
+            'Technology': ['Mechanical, office and computing machinery', 
+                          'Electrical machinery and electronic equipment', 'Transport equipment'],
+            'Other': ['Other Manufactures', 'Clothing']
+        }
+        
+        # Create a new column for the category
+        def assign_category(product_group):
+            for category, products in product_categories.items():
+                if product_group in products:
+                    return category
+            return 'Other'
+        
+        filtered_df['Category'] = filtered_df['Product Group'].apply(assign_category)
+        
+        # Make sure each product has at least a small positive value for the treemap
+        min_value = 0.001  # Small positive value
+        filtered_df['Percent for Treemap'] = filtered_df['Percent of Imports'].apply(
+            lambda x: max(x, min_value)
         )
         
-        # Add a border to make it look like a chart
+        # Check if tariff rate columns exist
+        has_tariff_rates = all(col in filtered_df.columns for col in ['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate'])
+        
+        # Create hover template based on available data
+        if has_tariff_rates:
+            hover_template = "<b>%{label}</b><br>Import: %{text}<br>MFN Tariff: %{customdata[0]:.1f}%<br>Bound Tariff: %{customdata[1]:.1f}%<extra></extra>"
+            custom_data = filtered_df[['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate']].values
+        else:
+            hover_template = "<b>%{label}</b><br>Import: %{text}<extra></extra>"
+            custom_data = None
+        
+        # Create the treemap using graph_objects
+        fig = go.Figure(go.Treemap(
+            labels=filtered_df['Product Group'].tolist(),
+            parents=filtered_df['Category'].tolist(),
+            values=filtered_df['Percent for Treemap'].tolist(),
+            text=filtered_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%").tolist(),
+            textinfo="label+text",
+            hovertemplate=hover_template,
+            customdata=custom_data,
+            marker=dict(
+                colors=filtered_df['Percent of Imports'],
+                colorscale=[
+                    [0, '#b3d1f7'],      # Much lighter blue for smallest values
+                    [0.08, '#7ec3f5'],  # Lighter blue
+                    [0.18, '#63b3ed'],  # Light blue
+                    [0.33, '#4299e1'],  
+                    [0.66, '#3182ce'],   
+                    [1, '#2c5282']      # Darkest blue for largest values
+                ],
+                line=dict(width=3, color='white')
+            ),
+            textfont=dict(
+                family='Roboto',
+                size=20,
+                color='white'
+            )
+        ))
+        
+        # Update layout
         fig.update_layout(
             title=f'US Import Distribution by Product Group ({selected_year})',
-            title_font_color=colors['dark_blue'],
-            title_font_size=30,
+            margin=dict(t=60, l=25, r=25, b=25),
+            title_font=dict(size=24, color='#ffffff', family='Roboto'),
+            paper_bgcolor='#212529',
+            separators='.',
+            font=dict(family='Roboto', size=14, color='#ffffff')
+        )
+        
+        # Calculate statistics for display
+        top_categories = filtered_df.groupby('Category')['Percent of Imports'].sum().sort_values(ascending=False)
+        top_products = filtered_df.sort_values('Percent of Imports', ascending=False).head(5)
+        
+        # Table styles with larger text to match the image style
+        table_header_style = {
+            'backgroundColor': colors['dark_blue'], 
+            'color': 'white', 
+            'fontWeight': 'bold', 
+            'padding': '15px',
+            'fontSize': '20px'
+        }
+        table_cell_style = {
+            'padding': '12px', 
+            'border': f'1px solid {colors["medium_blue"]}',
+            'fontSize': '18px'
+        }
+        percent_cell_style = {
+            'padding': '12px', 
+            'border': f'1px solid {colors["medium_blue"]}',
+            'fontSize': '22px',
+            'fontWeight': 'bold',
+            'color': colors['dark_blue']
+        }
+        table_style = {
+            'width': '100%', 
+            'borderCollapse': 'collapse', 
+            'boxShadow': '0 2px 4px rgba(0, 0, 0, 0.1)'
+        }
+        
+        # Create statistics HTML with improved styling
+        stats_html = [
+            html.Div([
+                html.Div([
+                    html.H4("Top Import Categories", style={'color': colors['dark_blue'], 'fontSize': '24px', 'fontWeight': 'bold'}),
+                    html.Table([
+                        html.Thead(html.Tr([
+                            html.Th("Category", style=table_header_style), 
+                            html.Th("% of Imports", style=table_header_style)
+                        ])),
+                        html.Tbody([
+                            html.Tr([
+                                html.Td(category, style=table_cell_style), 
+                                html.Td(f"{value:.1f}%".replace(',', '.'), style=percent_cell_style)
+                            ])
+                            for category, value in top_categories.items()
+                        ])
+                    ], style=table_style)
+                ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
+                
+                html.Div([
+                    html.H4("Top 5 Product Groups", style={'color': colors['dark_blue'], 'fontSize': '24px', 'fontWeight': 'bold'}),
+                    html.Table([
+                        html.Thead(html.Tr([
+                            html.Th("Product Group", style=table_header_style), 
+                            html.Th("% of Imports", style=table_header_style)
+                        ])),
+                        html.Tbody([
+                            html.Tr([
+                                html.Td(row['Product Group'], style=table_cell_style), 
+                                html.Td(f"{row['Percent of Imports']:.1f}%".replace(',', '.'), style=percent_cell_style)
+                            ])
+                            for _, row in top_products.iterrows()
+                        ])
+                    ], style=table_style)
+                ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top', 'marginLeft': '4%'})
+            ])
+        ]
+        
+        return fig, stats_html
+        
+    except Exception as e:
+        # Create an error figure
+        fig = go.Figure()
+        fig.add_annotation(
+            text=f"Error creating treemap: {str(e)}",
+            xref="paper", yref="paper",
+            x=0.5, y=0.5, showarrow=False,
+            font=dict(size=20, color='red')
+        )
+        fig.update_layout(
+            title=f'US Import Distribution by Product Group ({selected_year})',
             height=800,
             plot_bgcolor='rgba(45, 45, 45, 0.5)',
             paper_bgcolor=colors['card']
         )
         
-        # Return empty stats
-        stats_html = html.Div("No data available for the selected year", 
-                              style={'textAlign': 'center', 'padding': '50px', 'color': colors['dark_blue'], 'fontSize': '24px'})
+        # Return error message for stats
+        stats_html = html.Div(
+            f"Error processing data: {str(e)}",
+            style={'textAlign': 'center', 'padding': '50px', 'color': 'red', 'fontSize': '20px'}
+        )
+        
         return fig, stats_html
-    
-    # Classify products into categories for the treemap hierarchy
-    product_categories = {
-        'Agricultural': ['Live animals and meat', 'Dairy products', 'Fruits and vegetables', 
-                        'Coffee, tea, cocoa and spices', 'Cereals and food preparations', 
-                        'Oilseeds, fats and oils', 'Sugars and confectionery', 
-                        'Beverages and tobacco', 'Cotton, silk and wool', 
-                        'Other agricultural products', 'Fish and fish products'],
-        'Raw Materials': ['Minerals and metals', 'Petroleum'],
-        'Industrial': ['Chemicals', 'Wood, paper, furniture', 'Textiles', 'Rubber, leather and footwear'],
-        'Technology': ['Mechanical, office and computing machinery', 
-                      'Electrical machinery and electronic equipment', 'Transport equipment'],
-        'Other': ['Other Manufactures', 'Clothing']
-    }
-    
-    # Create a new column for the category
-    def assign_category(product_group):
-        for category, products in product_categories.items():
-            if product_group in products:
-                return category
-        return 'Other'
-    
-    filtered_df['Category'] = filtered_df['Product Group'].apply(assign_category)
-    
-    # Make sure each product has at least a small positive value for the treemap
-    # This prevents the "Weights sum to zero" error
-    min_value = 0.001  # Small positive value
-    filtered_df['Percent for Treemap'] = filtered_df['Percent of Imports'].apply(
-        lambda x: max(x, min_value)
-    )
-    
-    # Format the percentage values for display
-    filtered_df['Percent Display'] = filtered_df['Percent of Imports'].apply(
-        lambda x: f"{x:.1f}%"
-    )
-    
-    # Create a custom color scale to match the image (darker blue for higher values)
-    # Modified: More contrast for lighter values
-    custom_color_scale = [
-        [0, '#b3d1f7'],      # Much lighter blue for smallest values
-        [0.08, '#7ec3f5'],  # Lighter blue
-        [0.18, '#63b3ed'],  # Light blue
-        [0.33, '#4299e1'],  
-        [0.66, '#3182ce'],   
-        [1, '#2c5282']      # Darkest blue for largest values
-    ]
-    
-    # Create the treemap with custom blue colorscale to match the image
-    fig = px.treemap(
-        filtered_df,
-        path=['Category', 'Product Group'],
-        values='Percent for Treemap',  # Use the adjusted column
-        color='Percent of Imports',    # Original values for color
-        color_continuous_scale=custom_color_scale,  # Use custom scale
-        title=f'US Import Distribution by Product Group ({selected_year})',
-        hover_data=['Percent of Imports', 'MFN Average Tariff Rate', 'Final Bound Average Tariff Rate'],
-        labels={'Percent of Imports': 'Import %'},
-        custom_data=['Percent of Imports']  # Add this to use in texttemplate
-    )
-    
-    # Update layout to match the image style
-    fig = update_treemap_layout(fig)
-    
-    # Update traces to match the image style with large, prominent percentages
-    fig.update_traces(
-        marker=dict(
-            line=dict(width=3, color='white')  # Thicker white boundaries between sections
-        ),
-        root_color="#f0f4f8",
-        texttemplate='<b>%{label}<br>%{customdata[0]:.1f}%</b>',  # Bold percentage display
-        textfont=dict(
-            family='Roboto',
-            size=20,  # Larger font size
-            color='white'  # White text for better contrast
-        ),
-        textposition='middle center',
-        hovertemplate='<b>%{label}</b><br>Import: %{customdata[0]:.1f}%<br>MFN Tariff: %{customdata[1]:.1f}%<br>Bound Tariff: %{customdata[2]:.1f}%<extra></extra>'
-    )
-    
-    # Calculate statistics for display
-    top_categories = filtered_df.groupby('Category')['Percent of Imports'].sum().sort_values(ascending=False)
-    top_products = filtered_df.sort_values('Percent of Imports', ascending=False).head(5)
-    
-    # Table styles with larger text to match the image style
-    table_header_style = {
-        'backgroundColor': colors['dark_blue'], 
-        'color': 'white', 
-        'fontWeight': 'bold', 
-        'padding': '15px',
-        'fontSize': '20px'
-    }
-    table_cell_style = {
-        'padding': '12px', 
-        'border': f'1px solid {colors["medium_blue"]}',
-        'fontSize': '18px'
-    }
-    percent_cell_style = {
-        'padding': '12px', 
-        'border': f'1px solid {colors["medium_blue"]}',
-        'fontSize': '22px',
-        'fontWeight': 'bold',
-        'color': colors['dark_blue']
-    }
-    table_style = {
-        'width': '100%', 
-        'borderCollapse': 'collapse', 
-        'boxShadow': '0 2px 4px rgba(0, 0, 0, 0.1)'
-    }
-    
-    # Create statistics HTML with improved styling to match the image
-    # Using dots for decimal separator in the table values
-    stats_html = [
-        html.Div([
-            html.Div([
-                html.H4("Top Import Categories", style={'color': colors['dark_blue'], 'fontSize': '24px', 'fontWeight': 'bold'}),
-                html.Table([
-                    html.Thead(html.Tr([
-                        html.Th("Category", style=table_header_style), 
-                        html.Th("% of Imports", style=table_header_style)
-                    ])),
-                    html.Tbody([
-                        html.Tr([
-                            html.Td(category, style=table_cell_style), 
-                            html.Td(f"{value:.1f}%".replace(',', '.'), style=percent_cell_style)
-                        ])
-                        for category, value in top_categories.items()
-                    ])
-                ], style=table_style)
-            ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
-            
-            html.Div([
-                html.H4("Top 5 Product Groups", style={'color': colors['dark_blue'], 'fontSize': '24px', 'fontWeight': 'bold'}),
-                html.Table([
-                    html.Thead(html.Tr([
-                        html.Th("Product Group", style=table_header_style), 
-                        html.Th("% of Imports", style=table_header_style)
-                    ])),
-                    html.Tbody([
-                        html.Tr([
-                            html.Td(row['Product Group'], style=table_cell_style), 
-                            html.Td(f"{row['Percent of Imports']:.1f}%".replace(',', '.'), style=percent_cell_style)
-                        ])
-                        for _, row in top_products.iterrows()
-                    ])
-                ], style=table_style)
-            ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top', 'marginLeft': '4%'})
-        ])
-    ]
-    
-    return fig, stats_html
 
 # Add treemap explanation callback if needed
 @callback(
