@@ -1303,7 +1303,7 @@ def update_treemap(selected_year):
             ]
         }
         
-        # Ensure selected_year is an integer - handle any type conversion issues
+        # Ensure selected_year is an integer
         try:
             selected_year_int = int(selected_year)
         except (ValueError, TypeError):
@@ -1319,156 +1319,125 @@ def update_treemap(selected_year):
             else:
                 # Find the closest year
                 selected_year_int = min(available_years, key=lambda x: abs(x - selected_year_int))
-            
+        
         # Get data for selected year
         year_data = hard_coded_data[selected_year_int]
         
-        # Create a DataFrame without chained operations
-        plot_df = pd.DataFrame(year_data)
+        # Validate data
+        if not year_data or len(year_data) == 0:
+            raise ValueError("No data available for selected year")
         
-        # Create percent text column directly
-        percent_text_list = []
-        for idx, row in plot_df.iterrows():
-            percent = row['Percent of Imports']
-            percent_text_list.append(f"{percent:.1f}%")
+        # Add root element to each item for hierarchical structure
+        for item in year_data:
+            item["Root"] = "US Imports"
         
-        # Add the percent text column to the DataFrame
-        plot_df['Percent Text'] = percent_text_list
-        
-        # Check if we have data
-        if len(plot_df) == 0:
-            # Create empty figure with message
-            fig = go.Figure()
-            fig.add_annotation(
-                text=f"No import data available for {selected_year_int}",
-                xref="paper", yref="paper",
-                x=0.5, y=0.5, showarrow=False,
-                font=dict(size=30, color=colors['dark_blue'])
-            )
-            fig.update_layout(
-                title=f'US Import Distribution by Product Group ({selected_year_int})',
-                title_font_color=colors['dark_blue'],
-                title_font_size=30,
-                height=800,
-                plot_bgcolor='rgba(45, 45, 45, 0.5)',
-                paper_bgcolor=colors['card']
-            )
-            stats_html = html.Div("No data available for the selected year", 
-                                style={'textAlign': 'center', 'padding': '50px', 'color': colors['dark_blue'], 'fontSize': '24px'})
-            return fig, stats_html
-        
-        # Create basic treemap
+        # Create the treemap using plotly express
         fig = px.treemap(
-            plot_df,
-            path=['Category', 'Product Group'],
+            year_data,
+            path=['Root', 'Category', 'Product Group'],
             values='Percent of Imports',
             color='Percent of Imports',
-            color_continuous_scale='Blues',
-            custom_data=['Percent Text'],
+            color_continuous_scale=[[0, '#e3f2fd'], [0.5, '#64b5f6'], [1, '#1976d2']],
             title=f'US Import Distribution by Product Group ({selected_year_int})'
         )
         
-        # Set hovertemplate to only show percentage
-        fig.update_traces(
-            hovertemplate='<b>%{label}</b><br>%{customdata[0]}<extra></extra>'
-        )
-        
-        # Update layout
+        # Update layout - remove coloraxis_showscale to hide the heatbar legend
         fig.update_layout(
             margin=dict(t=60, l=25, r=25, b=25),
-            coloraxis_showscale=False,
             title_font=dict(size=24, color='#ffffff', family='Roboto'),
             paper_bgcolor='#212529',
-            font=dict(family='Roboto', size=14, color='#ffffff')
+            font=dict(family='Roboto', size=14, color='#ffffff'),
+            coloraxis_showscale=False  # Hide the heatbar legend
         )
         
-        # Calculate category totals without using groupby
-        category_totals = {}
-        for idx, row in plot_df.iterrows():
-            category = row['Category']
-            percent = row['Percent of Imports']
-            
-            if category in category_totals:
-                category_totals[category] += percent
-            else:
-                category_totals[category] = percent
+        # Simplify trace updates with reliable text coloring
+        fig.update_traces(
+            hovertemplate='<b>%{label}</b><br>%{value:.1f}%<extra></extra>',
+            textinfo='label+percent entry',
+            textfont=dict(size=14, color='black', family='Roboto', weight='bold'),
+            marker=dict(
+                line=dict(width=1, color='#212529')
+            )
+        )
         
-        # Prepare categories for stats
-        categories_data = []
-        for category, total in category_totals.items():
-            categories_data.append({
-                'Category': category,
-                'Percent of Imports': total
-            })
+        # Prepare statistics
+        # Calculate category totals
+        categories = {}
+        for item in year_data:
+            category = item["Category"]
+            if category not in categories:
+                categories[category] = 0
+            categories[category] += item["Percent of Imports"]
         
-        # Create DataFrame for categories and sort it
-        categories_df = pd.DataFrame(categories_data)
-        categories_df = categories_df.sort_values('Percent of Imports', ascending=False)
+        # Sort categories by total
+        sorted_categories = sorted(categories.items(), key=lambda x: x[1], reverse=True)
         
-        # Sort products and get top products without chained operations
-        products_df = plot_df.copy()
-        products_df = products_df.sort_values('Percent of Imports', ascending=False)
-        top_products = products_df.head(5)
+        # Sort products by percent
+        sorted_products = sorted(year_data, key=lambda x: x["Percent of Imports"], reverse=True)
+        top_products = sorted_products[:5]
         
-        # Styling for tables
+        # Table styling
         table_header_style = {
-            'backgroundColor': '#2c5282',  # Darker blue header
+            'backgroundColor': '#2c5282',
             'color': 'white', 
             'fontWeight': 'bold', 
-            'padding': '16px 20px',  # More padding
+            'padding': '16px 20px',
             'fontSize': '18px',
-            'borderBottom': '2px solid #90cdf4',  # Light blue border
+            'borderBottom': '2px solid #90cdf4',
             'textAlign': 'left'
         }
+        
         table_cell_style = {
-            'padding': '14px 20px',  # More padding
+            'padding': '14px 20px',
             'fontSize': '16px',
-            'color': '#e2e8f0',  # Light blue-gray text
-            'borderBottom': '1px solid #4a5568',  # Darker divider line
-            'backgroundColor': '#1a202c',  # Slightly lighter than background
-            'transition': 'background-color 0.2s'  # For hover effect
+            'color': '#e2e8f0',
+            'borderBottom': '1px solid #4a5568',
+            'backgroundColor': '#1a202c',
+            'transition': 'background-color 0.2s'
         }
+        
         percent_cell_style = {
-            'padding': '14px 20px',  # More padding
+            'padding': '14px 20px',
             'fontSize': '18px',
             'fontWeight': 'bold',
-            'color': '#63b3ed',  # Bright blue
-            'borderBottom': '1px solid #4a5568',  # Darker divider line
-            'backgroundColor': '#1a202c',  # Slightly lighter than background
+            'color': '#63b3ed',
+            'borderBottom': '1px solid #4a5568',
+            'backgroundColor': '#1a202c',
             'textAlign': 'right',
-            'transition': 'background-color 0.2s'  # For hover effect
+            'transition': 'background-color 0.2s'
         }
+        
         table_style = {
             'width': '100%', 
             'borderCollapse': 'separate',
             'borderSpacing': '0',
-            'backgroundColor': '#1a202c',  # Slightly lighter than background
+            'backgroundColor': '#1a202c',
             'borderRadius': '8px',
             'overflow': 'hidden',
-            'boxShadow': '0 4px 12px rgba(0, 0, 0, 0.3)'  # More pronounced shadow
+            'boxShadow': '0 4px 12px rgba(0, 0, 0, 0.3)'
         }
         
-        # Build categories table rows directly
+        # Create category rows
         category_rows = []
-        for idx, row in categories_df.iterrows():
+        for category, total in sorted_categories:
             category_rows.append(
                 html.Tr([
-                    html.Td(row['Category'], style=table_cell_style), 
-                    html.Td(f"{row['Percent of Imports']:.1f}%", style=percent_cell_style)
-                ], style={'hover': {'backgroundColor': '#2d3748'}})
-            )
-            
-        # Build product table rows directly
-        product_rows = []
-        for idx, row in top_products.iterrows():
-            product_rows.append(
-                html.Tr([
-                    html.Td(row['Product Group'], style=table_cell_style), 
-                    html.Td(row['Percent Text'], style=percent_cell_style)
+                    html.Td(category, style=table_cell_style), 
+                    html.Td(f"{total:.1f}%", style=percent_cell_style)
                 ], style={'hover': {'backgroundColor': '#2d3748'}})
             )
         
-        # Create statistics HTML with hover effects
+        # Create product rows
+        product_rows = []
+        for product in top_products:
+            product_rows.append(
+                html.Tr([
+                    html.Td(product["Product Group"], style=table_cell_style), 
+                    html.Td(f"{product['Percent of Imports']:.1f}%", style=percent_cell_style)
+                ], style={'hover': {'backgroundColor': '#2d3748'}})
+            )
+        
+        # Create statistics HTML
         stats_html = [
             html.Div([
                 html.Div([
@@ -1477,7 +1446,7 @@ def update_treemap(selected_year):
                         'fontSize': '22px', 
                         'fontWeight': 'bold',
                         'marginBottom': '15px',
-                        'borderLeft': '4px solid #3182ce',  # Left border accent
+                        'borderLeft': '4px solid #3182ce',
                         'paddingLeft': '10px'
                     }),
                     html.Table([
@@ -1495,7 +1464,7 @@ def update_treemap(selected_year):
                         'fontSize': '22px', 
                         'fontWeight': 'bold',
                         'marginBottom': '15px',
-                        'borderLeft': '4px solid #3182ce',  # Left border accent
+                        'borderLeft': '4px solid #3182ce',
                         'paddingLeft': '10px'
                     }),
                     html.Table([
