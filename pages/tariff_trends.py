@@ -1096,36 +1096,35 @@ def update_treemap(selected_year):
                                 style={'textAlign': 'center', 'padding': '50px', 'color': colors['dark_blue'], 'fontSize': '24px'})
             return fig, stats_html
         
+        # Check if Category column exists, if not create it
+        if 'Category' not in filtered_df.columns:
+            print("Category column not found, creating it...")
+            # Classify products into categories for the treemap hierarchy
+            product_categories = {
+                'Agricultural': ['Live animals and meat', 'Dairy products', 'Fruits and vegetables', 
+                                'Coffee, tea, cocoa and spices', 'Cereals and food preparations', 
+                                'Oilseeds, fats and oils', 'Sugars and confectionery', 
+                                'Beverages and tobacco', 'Cotton, silk and wool', 
+                                'Other agricultural products', 'Fish and fish products'],
+                'Raw Materials': ['Minerals and metals', 'Petroleum'],
+                'Industrial': ['Chemicals', 'Wood, paper, furniture', 'Textiles', 'Rubber, leather and footwear'],
+                'Technology': ['Mechanical, office and computing machinery', 
+                              'Electrical machinery and electronic equipment', 'Transport equipment'],
+                'Other': ['Other Manufactures', 'Clothing']
+            }
+            
+            # Create a new column for the category
+            def assign_category(product_group):
+                for category, products in product_categories.items():
+                    if product_group in products:
+                        return category
+                return 'Other'
+            
+            filtered_df['Category'] = filtered_df['Product Group'].apply(assign_category)
+        
         # Print category information
         print(f"Unique categories: {filtered_df['Category'].unique()}")
         print(f"Category counts: {filtered_df['Category'].value_counts()}")
-        
-        # Classify products into categories for the treemap hierarchy
-        product_categories = {
-            'Agricultural': ['Live animals and meat', 'Dairy products', 'Fruits and vegetables', 
-                            'Coffee, tea, cocoa and spices', 'Cereals and food preparations', 
-                            'Oilseeds, fats and oils', 'Sugars and confectionery', 
-                            'Beverages and tobacco', 'Cotton, silk and wool', 
-                            'Other agricultural products', 'Fish and fish products'],
-            'Raw Materials': ['Minerals and metals', 'Petroleum'],
-            'Industrial': ['Chemicals', 'Wood, paper, furniture', 'Textiles', 'Rubber, leather and footwear'],
-            'Technology': ['Mechanical, office and computing machinery', 
-                          'Electrical machinery and electronic equipment', 'Transport equipment'],
-            'Other': ['Other Manufactures', 'Clothing']
-        }
-        
-        # Create a new column for the category
-        def assign_category(product_group):
-            for category, products in product_categories.items():
-                if product_group in products:
-                    return category
-            return 'Other'
-        
-        filtered_df['Category'] = filtered_df['Product Group'].apply(assign_category)
-        
-        # Print category assignment results
-        print(f"Assigned categories: {filtered_df['Category'].unique()}")
-        print(f"Assigned category counts: {filtered_df['Category'].value_counts()}")
         
         # Make sure each product has at least a small positive value for the treemap
         min_value = 0.001  # Small positive value
