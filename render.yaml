@@ -6,13 +6,4 @@ services:
       apt-get update && apt-get install -y locales
       locale-gen en_US.UTF-8
       pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.9.0
-      - key: LC_ALL
-        value: en_US.UTF-8
-      - key: LANG
-        value: en_US.UTF-8
-      - key: LANGUAGE
-        value: en_US.UTF-8 
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT 

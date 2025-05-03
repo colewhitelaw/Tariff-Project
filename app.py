@@ -12,10 +12,10 @@ import json
 import os
 from dash import page_registry, register_page
 
-# Set your Mapbox access token (get a free token from mapbox.com)
-# Ideally, this would be stored as an environment variable
-# mapbox_token = "pk.eyJ1IjoiY3doaXRlbGEiLCJhIjoiY205dDNndWZiMDcxbTJsb2N2ajllenM3dyJ9.pJq1KBvg-bC0pm842UZzNQ" # Moved to pages/home.py
-# os.environ["MAPBOX_API_KEY"] = mapbox_token # Moved to pages/home.py
+# Set Mapbox access token from environment variable
+mapbox_token = os.environ.get('MAPBOX_API_KEY')
+if mapbox_token:
+    os.environ["MAPBOX_API_KEY"] = mapbox_token
 
 # Initialize the app with Bootstrap
 app = dash.Dash(
