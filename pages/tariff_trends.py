@@ -1104,11 +1104,15 @@ def update_treemap(selected_year):
         root_label = "US Imports"
         categories = filtered_df['Category'].unique().tolist()
         # Build category label mapping for exact match
-        category_label_map = {cat: f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)" for cat in categories}
-        category_labels = [category_label_map[cat] for cat in categories]
+        category_label_map = {}
+        category_labels = []
+        for cat in categories:
+            label = f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)"
+            category_label_map[cat] = label
+            category_labels.append(label)
         product_labels = filtered_df['Product Group'].tolist()
         labels = [root_label] + category_labels + product_labels
-        parents = [''] + [root_label]*len(category_labels) + [category_label_map[cat] for cat in filtered_df['Category']]
+        parents = [''] + [root_label] * len(category_labels) + [category_label_map[cat] for cat in filtered_df['Category']]
         values = [None]*(1+len(category_labels)) + filtered_df['Percent for Treemap'].tolist()
         colors_arr = [None]*(1+len(category_labels)) + filtered_df['Percent of Imports'].tolist()
         if has_tariff_rates:
