@@ -1059,20 +1059,9 @@ def update_import_share_explanation(selected_countries):
 )
 def update_treemap(selected_year):
     try:
-        # Add debug information
         print(f"Selected year: {selected_year}")
-        print(f"DataFrame columns: {product_group_df.columns.tolist()}")
-        print(f"DataFrame shape: {product_group_df.shape}")
-        
-        # Filter data by selected year
         filtered_df = product_group_df[product_group_df['Year'] == selected_year].copy()
-        print(f"Filtered DataFrame shape: {filtered_df.shape}")
-        print(f"Filtered DataFrame columns: {filtered_df.columns.tolist()}")
-        
-        # Check if we have valid data for this year
         if filtered_df.empty or filtered_df['Percent of Imports'].sum() == 0:
-            print("No data available for selected year")
-            # Create an empty figure with a message
             fig = go.Figure()
             fig.add_annotation(
                 text=f"No import data available for {selected_year}",
@@ -1080,8 +1069,6 @@ def update_treemap(selected_year):
                 x=0.5, y=0.5, showarrow=False,
                 font=dict(size=30, color=colors['dark_blue'])
             )
-            
-            # Add a border to make it look like a chart
             fig.update_layout(
                 title=f'US Import Distribution by Product Group ({selected_year})',
                 title_font_color=colors['dark_blue'],
@@ -1090,16 +1077,10 @@ def update_treemap(selected_year):
                 plot_bgcolor='rgba(45, 45, 45, 0.5)',
                 paper_bgcolor=colors['card']
             )
-            
-            # Return empty stats
             stats_html = html.Div("No data available for the selected year", 
                                 style={'textAlign': 'center', 'padding': '50px', 'color': colors['dark_blue'], 'fontSize': '24px'})
             return fig, stats_html
-        
-        # Check if Category column exists, if not create it
         if 'Category' not in filtered_df.columns:
-            print("Category column not found, creating it...")
-            # Classify products into categories for the treemap hierarchy
             product_categories = {
                 'Agricultural': ['Live animals and meat', 'Dairy products', 'Fruits and vegetables', 
                                 'Coffee, tea, cocoa and spices', 'Cereals and food preparations', 
@@ -1112,82 +1093,55 @@ def update_treemap(selected_year):
                               'Electrical machinery and electronic equipment', 'Transport equipment'],
                 'Other': ['Other Manufactures', 'Clothing']
             }
-            
-            # Create a new column for the category
             def assign_category(product_group):
                 for category, products in product_categories.items():
                     if product_group in products:
                         return category
                 return 'Other'
-            
             filtered_df['Category'] = filtered_df['Product Group'].apply(assign_category)
-        
-        # Print category information
-        print(f"Unique categories: {filtered_df['Category'].unique()}")
-        print(f"Category counts: {filtered_df['Category'].value_counts()}")
-        
-        # Make sure each product has at least a small positive value for the treemap
-        min_value = 0.001  # Small positive value
-        filtered_df['Percent for Treemap'] = filtered_df['Percent of Imports'].apply(
-            lambda x: max(x, min_value)
-        )
-        
-        # Check if tariff rate columns exist
+        min_value = 0.001
+        filtered_df['Percent for Treemap'] = filtered_df['Percent of Imports'].apply(lambda x: max(x, min_value))
         has_tariff_rates = all(col in filtered_df.columns for col in ['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate'])
-        print(f"Has tariff rates: {has_tariff_rates}")
-        
-        # Create hover template based on available data
-        if has_tariff_rates:
-            hover_template = "<b>%{label}</b><br>Import: %{text}<br>MFN Tariff: %{customdata[0]:.1f}%<br>Bound Tariff: %{customdata[1]:.1f}%<extra></extra>"
-            custom_data = filtered_df[['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate']].values
-        else:
-            hover_template = "<b>%{label}</b><br>Import: %{text}<extra></extra>"
-            custom_data = None
-        
-        # Create lists for treemap with a single root and unique labels
         root_label = "US Imports"
-        category_labels = [f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)" 
-                         for cat in filtered_df['Category'].unique()]
+        categories = filtered_df['Category'].unique().tolist()
+        category_labels = [f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)" for cat in categories]
         product_labels = filtered_df['Product Group'].tolist()
-        
-        # Print hierarchy information
-        print(f"Root label: {root_label}")
-        print(f"Category labels: {category_labels}")
-        print(f"Number of product labels: {len(product_labels)}")
-        
         labels = [root_label] + category_labels + product_labels
-        parents = [''] + [root_label] * len(category_labels) + [f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)" 
-                                                              for cat in filtered_df['Category']]
-        values = [filtered_df['Percent for Treemap'].sum()] + \
-                [filtered_df[filtered_df['Category'] == cat]['Percent for Treemap'].sum() 
-                 for cat in filtered_df['Category'].unique()] + \
-                filtered_df['Percent for Treemap'].tolist()
-        text = [''] + [''] * len(category_labels) + filtered_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%").tolist()
-        
-        # Print hierarchy structure
-        print(f"Labels length: {len(labels)}")
-        print(f"Parents length: {len(parents)}")
-        print(f"Values length: {len(values)}")
-        print(f"Text length: {len(text)}")
-        
-        # Create the treemap using graph_objects
+        parents = [''] + [root_label]*len(category_labels) + [f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)" for cat in filtered_df['Category']]
+        # Only assign values to product group nodes (leaf nodes)
+        values = [None]*(1+len(category_labels)) + filtered_df['Percent for Treemap'].tolist()
+        # Only assign colors to product group nodes
+        colors_arr = [None]*(1+len(category_labels)) + filtered_df['Percent of Imports'].tolist()
+        # Only assign customdata to product group nodes
+        if has_tariff_rates:
+            customdata_arr = [None]*(1+len(category_labels)) + filtered_df[['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate']].values.tolist()
+        else:
+            customdata_arr = [None]*(1+len(category_labels)) + [[None, None]]*len(product_labels)
+        # Only assign text to product group nodes
+        text_arr = ['']*(1+len(category_labels)) + filtered_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%").tolist()
+        # Conditional hovertemplate
+        hovertemplate_arr = ['<b>%{label}</b><extra></extra>']*(1+len(category_labels))
+        if has_tariff_rates:
+            hovertemplate_arr += ["<b>%{label}</b><br>Import: %{text}<br>MFN Tariff: %{customdata[0]:.1f}%<br>Bound Tariff: %{customdata[1]:.1f}%<extra></extra>"]*len(product_labels)
+        else:
+            hovertemplate_arr += ["<b>%{label}</b><br>Import: %{text}<extra></extra>"]*len(product_labels)
         fig = go.Figure(go.Treemap(
             labels=labels,
             parents=parents,
             values=values,
-            text=text,
+            text=text_arr,
             textinfo="label+text",
-            hovertemplate=hover_template,
-            customdata=custom_data,
+            hovertemplate=hovertemplate_arr,
+            customdata=customdata_arr,
             marker=dict(
-                colors=filtered_df['Percent of Imports'],
+                colors=colors_arr,
                 colorscale=[
-                    [0, '#b3d1f7'],      # Much lighter blue for smallest values
-                    [0.08, '#7ec3f5'],  # Lighter blue
-                    [0.18, '#63b3ed'],  # Light blue
-                    [0.33, '#4299e1'],  
-                    [0.66, '#3182ce'],   
-                    [1, '#2c5282']      # Darkest blue for largest values
+                    [0, '#b3d1f7'],
+                    [0.08, '#7ec3f5'],
+                    [0.18, '#63b3ed'],
+                    [0.33, '#4299e1'],
+                    [0.66, '#3182ce'],
+                    [1, '#2c5282']
                 ],
                 line=dict(width=3, color='white')
             ),
@@ -1195,10 +1149,9 @@ def update_treemap(selected_year):
                 family='Roboto',
                 size=20,
                 color='white'
-            )
+            ),
+            branchvalues='total'
         ))
-        
-        # Update layout
         fig.update_layout(
             title=f'US Import Distribution by Product Group ({selected_year})',
             margin=dict(t=60, l=25, r=25, b=25),
@@ -1207,12 +1160,8 @@ def update_treemap(selected_year):
             separators='.',
             font=dict(family='Roboto', size=14, color='#ffffff')
         )
-        
-        # Calculate statistics for display
         top_categories = filtered_df.groupby('Category')['Percent of Imports'].sum().sort_values(ascending=False)
         top_products = filtered_df.sort_values('Percent of Imports', ascending=False).head(5)
-        
-        # Table styles with larger text to match the image style
         table_header_style = {
             'backgroundColor': colors['dark_blue'], 
             'color': 'white', 
@@ -1237,8 +1186,6 @@ def update_treemap(selected_year):
             'borderCollapse': 'collapse', 
             'boxShadow': '0 2px 4px rgba(0, 0, 0, 0.1)'
         }
-        
-        # Create statistics HTML with improved styling
         stats_html = [
             html.Div([
                 html.Div([
@@ -1257,7 +1204,6 @@ def update_treemap(selected_year):
                         ])
                     ], style=table_style)
                 ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
-                
                 html.Div([
                     html.H4("Top 5 Product Groups", style={'color': colors['dark_blue'], 'fontSize': '24px', 'fontWeight': 'bold'}),
                     html.Table([
@@ -1276,16 +1222,11 @@ def update_treemap(selected_year):
                 ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top', 'marginLeft': '4%'})
             ])
         ]
-        
         return fig, stats_html
-        
     except Exception as e:
-        # Print the full error traceback
         import traceback
         print(f"Error in update_treemap: {str(e)}")
         print(traceback.format_exc())
-        
-        # Create an error figure
         fig = go.Figure()
         fig.add_annotation(
             text=f"Error creating treemap: {str(e)}",
@@ -1299,13 +1240,10 @@ def update_treemap(selected_year):
             plot_bgcolor='rgba(45, 45, 45, 0.5)',
             paper_bgcolor=colors['card']
         )
-        
-        # Return error message for stats
         stats_html = html.Div(
             f"Error processing data: {str(e)}",
             style={'textAlign': 'center', 'padding': '50px', 'color': 'red', 'fontSize': '20px'}
         )
-        
         return fig, stats_html
 
 # Add treemap explanation callback if needed
