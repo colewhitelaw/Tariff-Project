@@ -21,7 +21,13 @@ import locale
 import os
 
 # Set locale to ensure dots are used for decimals
-locale.setlocale(locale.LC_NUMERIC, 'en_US.UTF-8')
+try:
+    locale.setlocale(locale.LC_NUMERIC, 'en_US.UTF-8')
+except locale.Error:
+    try:
+        locale.setlocale(locale.LC_NUMERIC, 'C')
+    except locale.Error:
+        pass  # Continue without setting locale
 
 # Define data directory
 DATA_DIR = 'Data'

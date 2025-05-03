@@ -2,12 +2,17 @@ services:
   - type: web
     name: tariff-dashboard
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: |
+      apt-get update && apt-get install -y locales
+      locale-gen en_US.UTF-8
+      pip install -r requirements.txt
     startCommand: gunicorn app:server
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.0
       - key: LC_ALL
-        value: C.UTF-8
+        value: en_US.UTF-8
       - key: LANG
-        value: C.UTF-8 
+        value: en_US.UTF-8
+      - key: LANGUAGE
+        value: en_US.UTF-8 
