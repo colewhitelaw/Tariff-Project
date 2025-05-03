@@ -82,6 +82,8 @@ app.layout = html.Div([
     ], fluid=True)
 ])
 
-# Run the app
+# Create server variable for Gunicorn
+server = app.server
+
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8050))) 
