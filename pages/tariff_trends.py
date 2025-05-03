@@ -1059,8 +1059,20 @@ def update_import_share_explanation(selected_countries):
 )
 def update_treemap(selected_year):
     try:
+        # Ensure selected_year is an integer
+        selected_year = int(selected_year)
+        print(f"Selected year: {selected_year}, type: {type(selected_year)}")
+        
+        # Debug DataFrame year column
+        print(f"Product group DataFrame years: {product_group_df['Year'].unique()}")
+        print(f"Year column type: {product_group_df['Year'].dtype}")
+        
+        # Explicitly convert Year column to integer to ensure comparison works
+        product_group_df['Year'] = product_group_df['Year'].astype(int)
+        
         # Filter data for selected year
         filtered_df = product_group_df[product_group_df['Year'] == selected_year].copy()
+        print(f"Filtered DataFrame has {len(filtered_df)} rows for year {selected_year}")
         
         # Check if we have data
         if filtered_df.empty:
