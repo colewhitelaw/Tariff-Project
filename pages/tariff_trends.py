@@ -1059,33 +1059,294 @@ def update_import_share_explanation(selected_countries):
 )
 def update_treemap(selected_year):
     try:
-        # Ensure selected_year is an integer
-        selected_year = int(selected_year)
+        # Hard-coded data for years 2015-2024
+        hard_coded_data = {
+            2015: [
+                {"Product Group": "Live animals and meat", "Category": "Agricultural", "Percent of Imports": 1.4},
+                {"Product Group": "Dairy products", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Fruits and vegetables", "Category": "Agricultural", "Percent of Imports": 2.2},
+                {"Product Group": "Coffee, tea, cocoa and spices", "Category": "Agricultural", "Percent of Imports": 0.7},
+                {"Product Group": "Cereals and food preparations", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Oilseeds, fats and oils", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Sugars and confectionery", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Beverages and tobacco", "Category": "Agricultural", "Percent of Imports": 0.8},
+                {"Product Group": "Cotton, silk and wool", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Other agricultural products", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Fish and fish products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Minerals and metals", "Category": "Raw Materials", "Percent of Imports": 10.5},
+                {"Product Group": "Petroleum", "Category": "Raw Materials", "Percent of Imports": 9.8},
+                {"Product Group": "Chemicals", "Category": "Industrial", "Percent of Imports": 8.9},
+                {"Product Group": "Wood, paper, furniture", "Category": "Industrial", "Percent of Imports": 3.4},
+                {"Product Group": "Textiles", "Category": "Industrial", "Percent of Imports": 2.0},
+                {"Product Group": "Rubber, leather and footwear", "Category": "Industrial", "Percent of Imports": 3.0},
+                {"Product Group": "Mechanical, office and computing machinery", "Category": "Technology", "Percent of Imports": 14.8},
+                {"Product Group": "Electrical machinery and electronic equipment", "Category": "Technology", "Percent of Imports": 18.5},
+                {"Product Group": "Transport equipment", "Category": "Technology", "Percent of Imports": 11.2},
+                {"Product Group": "Other Manufactures", "Category": "Other", "Percent of Imports": 7.4},
+                {"Product Group": "Clothing", "Category": "Other", "Percent of Imports": 3.6}
+            ],
+            2016: [
+                {"Product Group": "Live animals and meat", "Category": "Agricultural", "Percent of Imports": 1.3},
+                {"Product Group": "Dairy products", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Fruits and vegetables", "Category": "Agricultural", "Percent of Imports": 2.2},
+                {"Product Group": "Coffee, tea, cocoa and spices", "Category": "Agricultural", "Percent of Imports": 0.7},
+                {"Product Group": "Cereals and food preparations", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Oilseeds, fats and oils", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Sugars and confectionery", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Beverages and tobacco", "Category": "Agricultural", "Percent of Imports": 0.8},
+                {"Product Group": "Cotton, silk and wool", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Other agricultural products", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Fish and fish products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Minerals and metals", "Category": "Raw Materials", "Percent of Imports": 10.2},
+                {"Product Group": "Petroleum", "Category": "Raw Materials", "Percent of Imports": 9.2},
+                {"Product Group": "Chemicals", "Category": "Industrial", "Percent of Imports": 9.0},
+                {"Product Group": "Wood, paper, furniture", "Category": "Industrial", "Percent of Imports": 3.4},
+                {"Product Group": "Textiles", "Category": "Industrial", "Percent of Imports": 1.9},
+                {"Product Group": "Rubber, leather and footwear", "Category": "Industrial", "Percent of Imports": 3.0},
+                {"Product Group": "Mechanical, office and computing machinery", "Category": "Technology", "Percent of Imports": 14.9},
+                {"Product Group": "Electrical machinery and electronic equipment", "Category": "Technology", "Percent of Imports": 18.7},
+                {"Product Group": "Transport equipment", "Category": "Technology", "Percent of Imports": 11.4},
+                {"Product Group": "Other Manufactures", "Category": "Other", "Percent of Imports": 7.3},
+                {"Product Group": "Clothing", "Category": "Other", "Percent of Imports": 3.5}
+            ],
+            2017: [
+                {"Product Group": "Live animals and meat", "Category": "Agricultural", "Percent of Imports": 1.3},
+                {"Product Group": "Dairy products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Fruits and vegetables", "Category": "Agricultural", "Percent of Imports": 2.1},
+                {"Product Group": "Coffee, tea, cocoa and spices", "Category": "Agricultural", "Percent of Imports": 0.7},
+                {"Product Group": "Cereals and food preparations", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Oilseeds, fats and oils", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Sugars and confectionery", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Beverages and tobacco", "Category": "Agricultural", "Percent of Imports": 0.8},
+                {"Product Group": "Cotton, silk and wool", "Category": "Agricultural", "Percent of Imports": 0.1},
+                {"Product Group": "Other agricultural products", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Fish and fish products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Minerals and metals", "Category": "Raw Materials", "Percent of Imports": 10.6},
+                {"Product Group": "Petroleum", "Category": "Raw Materials", "Percent of Imports": 9.5},
+                {"Product Group": "Chemicals", "Category": "Industrial", "Percent of Imports": 9.1},
+                {"Product Group": "Wood, paper, furniture", "Category": "Industrial", "Percent of Imports": 3.5},
+                {"Product Group": "Textiles", "Category": "Industrial", "Percent of Imports": 1.8},
+                {"Product Group": "Rubber, leather and footwear", "Category": "Industrial", "Percent of Imports": 3.1},
+                {"Product Group": "Mechanical, office and computing machinery", "Category": "Technology", "Percent of Imports": 14.7},
+                {"Product Group": "Electrical machinery and electronic equipment", "Category": "Technology", "Percent of Imports": 18.4},
+                {"Product Group": "Transport equipment", "Category": "Technology", "Percent of Imports": 11.6},
+                {"Product Group": "Other Manufactures", "Category": "Other", "Percent of Imports": 7.2},
+                {"Product Group": "Clothing", "Category": "Other", "Percent of Imports": 3.4}
+            ],
+            2018: [
+                {"Product Group": "Live animals and meat", "Category": "Agricultural", "Percent of Imports": 1.2},
+                {"Product Group": "Dairy products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Fruits and vegetables", "Category": "Agricultural", "Percent of Imports": 2.1},
+                {"Product Group": "Coffee, tea, cocoa and spices", "Category": "Agricultural", "Percent of Imports": 0.7},
+                {"Product Group": "Cereals and food preparations", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Oilseeds, fats and oils", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Sugars and confectionery", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Beverages and tobacco", "Category": "Agricultural", "Percent of Imports": 0.9},
+                {"Product Group": "Cotton, silk and wool", "Category": "Agricultural", "Percent of Imports": 0.1},
+                {"Product Group": "Other agricultural products", "Category": "Agricultural", "Percent of Imports": 0.5},
+                {"Product Group": "Fish and fish products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Minerals and metals", "Category": "Raw Materials", "Percent of Imports": 11.0},
+                {"Product Group": "Petroleum", "Category": "Raw Materials", "Percent of Imports": 10.0},
+                {"Product Group": "Chemicals", "Category": "Industrial", "Percent of Imports": 9.3},
+                {"Product Group": "Wood, paper, furniture", "Category": "Industrial", "Percent of Imports": 3.6},
+                {"Product Group": "Textiles", "Category": "Industrial", "Percent of Imports": 1.8},
+                {"Product Group": "Rubber, leather and footwear", "Category": "Industrial", "Percent of Imports": 3.1},
+                {"Product Group": "Mechanical, office and computing machinery", "Category": "Technology", "Percent of Imports": 14.5},
+                {"Product Group": "Electrical machinery and electronic equipment", "Category": "Technology", "Percent of Imports": 18.2},
+                {"Product Group": "Transport equipment", "Category": "Technology", "Percent of Imports": 11.7},
+                {"Product Group": "Other Manufactures", "Category": "Other", "Percent of Imports": 7.0},
+                {"Product Group": "Clothing", "Category": "Other", "Percent of Imports": 3.3}
+            ],
+            2019: [
+                {"Product Group": "Live animals and meat", "Category": "Agricultural", "Percent of Imports": 1.2},
+                {"Product Group": "Dairy products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Fruits and vegetables", "Category": "Agricultural", "Percent of Imports": 2.1},
+                {"Product Group": "Coffee, tea, cocoa and spices", "Category": "Agricultural", "Percent of Imports": 0.7},
+                {"Product Group": "Cereals and food preparations", "Category": "Agricultural", "Percent of Imports": 0.5},
+                {"Product Group": "Oilseeds, fats and oils", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Sugars and confectionery", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Beverages and tobacco", "Category": "Agricultural", "Percent of Imports": 0.9},
+                {"Product Group": "Cotton, silk and wool", "Category": "Agricultural", "Percent of Imports": 0.1},
+                {"Product Group": "Other agricultural products", "Category": "Agricultural", "Percent of Imports": 0.5},
+                {"Product Group": "Fish and fish products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Minerals and metals", "Category": "Raw Materials", "Percent of Imports": 11.2},
+                {"Product Group": "Petroleum", "Category": "Raw Materials", "Percent of Imports": 9.2},
+                {"Product Group": "Chemicals", "Category": "Industrial", "Percent of Imports": 9.4},
+                {"Product Group": "Wood, paper, furniture", "Category": "Industrial", "Percent of Imports": 3.6},
+                {"Product Group": "Textiles", "Category": "Industrial", "Percent of Imports": 1.7},
+                {"Product Group": "Rubber, leather and footwear", "Category": "Industrial", "Percent of Imports": 3.2},
+                {"Product Group": "Mechanical, office and computing machinery", "Category": "Technology", "Percent of Imports": 14.5},
+                {"Product Group": "Electrical machinery and electronic equipment", "Category": "Technology", "Percent of Imports": 18.2},
+                {"Product Group": "Transport equipment", "Category": "Technology", "Percent of Imports": 12.0},
+                {"Product Group": "Other Manufactures", "Category": "Other", "Percent of Imports": 7.1},
+                {"Product Group": "Clothing", "Category": "Other", "Percent of Imports": 3.2}
+            ],
+            2020: [
+                {"Product Group": "Live animals and meat", "Category": "Agricultural", "Percent of Imports": 1.2},
+                {"Product Group": "Dairy products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Fruits and vegetables", "Category": "Agricultural", "Percent of Imports": 2.1},
+                {"Product Group": "Coffee, tea, cocoa and spices", "Category": "Agricultural", "Percent of Imports": 0.8},
+                {"Product Group": "Cereals and food preparations", "Category": "Agricultural", "Percent of Imports": 0.5},
+                {"Product Group": "Oilseeds, fats and oils", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Sugars and confectionery", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Beverages and tobacco", "Category": "Agricultural", "Percent of Imports": 0.9},
+                {"Product Group": "Cotton, silk and wool", "Category": "Agricultural", "Percent of Imports": 0.1},
+                {"Product Group": "Other agricultural products", "Category": "Agricultural", "Percent of Imports": 0.5},
+                {"Product Group": "Fish and fish products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Minerals and metals", "Category": "Raw Materials", "Percent of Imports": 11.4},
+                {"Product Group": "Petroleum", "Category": "Raw Materials", "Percent of Imports": 8.6},
+                {"Product Group": "Chemicals", "Category": "Industrial", "Percent of Imports": 9.5},
+                {"Product Group": "Wood, paper, furniture", "Category": "Industrial", "Percent of Imports": 3.6},
+                {"Product Group": "Textiles", "Category": "Industrial", "Percent of Imports": 1.7},
+                {"Product Group": "Rubber, leather and footwear", "Category": "Industrial", "Percent of Imports": 3.2},
+                {"Product Group": "Mechanical, office and computing machinery", "Category": "Technology", "Percent of Imports": 14.4},
+                {"Product Group": "Electrical machinery and electronic equipment", "Category": "Technology", "Percent of Imports": 18.1},
+                {"Product Group": "Transport equipment", "Category": "Technology", "Percent of Imports": 11.9},
+                {"Product Group": "Other Manufactures", "Category": "Other", "Percent of Imports": 7.1},
+                {"Product Group": "Clothing", "Category": "Other", "Percent of Imports": 3.2}
+            ],
+            2021: [
+                {"Product Group": "Live animals and meat", "Category": "Agricultural", "Percent of Imports": 1.1},
+                {"Product Group": "Dairy products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Fruits and vegetables", "Category": "Agricultural", "Percent of Imports": 2.0},
+                {"Product Group": "Coffee, tea, cocoa and spices", "Category": "Agricultural", "Percent of Imports": 0.9},
+                {"Product Group": "Cereals and food preparations", "Category": "Agricultural", "Percent of Imports": 0.6},
+                {"Product Group": "Oilseeds, fats and oils", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Sugars and confectionery", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Beverages and tobacco", "Category": "Agricultural", "Percent of Imports": 1.0},
+                {"Product Group": "Cotton, silk and wool", "Category": "Agricultural", "Percent of Imports": 0.1},
+                {"Product Group": "Other agricultural products", "Category": "Agricultural", "Percent of Imports": 0.6},
+                {"Product Group": "Fish and fish products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Minerals and metals", "Category": "Raw Materials", "Percent of Imports": 12.2},
+                {"Product Group": "Petroleum", "Category": "Raw Materials", "Percent of Imports": 9.4},
+                {"Product Group": "Chemicals", "Category": "Industrial", "Percent of Imports": 9.7},
+                {"Product Group": "Wood, paper, furniture", "Category": "Industrial", "Percent of Imports": 4.1},
+                {"Product Group": "Textiles", "Category": "Industrial", "Percent of Imports": 1.8},
+                {"Product Group": "Rubber, leather and footwear", "Category": "Industrial", "Percent of Imports": 3.3},
+                {"Product Group": "Mechanical, office and computing machinery", "Category": "Technology", "Percent of Imports": 14.1},
+                {"Product Group": "Electrical machinery and electronic equipment", "Category": "Technology", "Percent of Imports": 17.5},
+                {"Product Group": "Transport equipment", "Category": "Technology", "Percent of Imports": 11.5},
+                {"Product Group": "Other Manufactures", "Category": "Other", "Percent of Imports": 6.9},
+                {"Product Group": "Clothing", "Category": "Other", "Percent of Imports": 3.0}
+            ],
+            2022: [
+                {"Product Group": "Live animals and meat", "Category": "Agricultural", "Percent of Imports": 1.0},
+                {"Product Group": "Dairy products", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Fruits and vegetables", "Category": "Agricultural", "Percent of Imports": 1.9},
+                {"Product Group": "Coffee, tea, cocoa and spices", "Category": "Agricultural", "Percent of Imports": 1.0},
+                {"Product Group": "Cereals and food preparations", "Category": "Agricultural", "Percent of Imports": 0.7},
+                {"Product Group": "Oilseeds, fats and oils", "Category": "Agricultural", "Percent of Imports": 0.5},
+                {"Product Group": "Sugars and confectionery", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Beverages and tobacco", "Category": "Agricultural", "Percent of Imports": 1.1},
+                {"Product Group": "Cotton, silk and wool", "Category": "Agricultural", "Percent of Imports": 0.1},
+                {"Product Group": "Other agricultural products", "Category": "Agricultural", "Percent of Imports": 0.7},
+                {"Product Group": "Fish and fish products", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Minerals and metals", "Category": "Raw Materials", "Percent of Imports": 11.8},
+                {"Product Group": "Petroleum", "Category": "Raw Materials", "Percent of Imports": 10.3},
+                {"Product Group": "Chemicals", "Category": "Industrial", "Percent of Imports": 9.9},
+                {"Product Group": "Wood, paper, furniture", "Category": "Industrial", "Percent of Imports": 3.8},
+                {"Product Group": "Textiles", "Category": "Industrial", "Percent of Imports": 1.6},
+                {"Product Group": "Rubber, leather and footwear", "Category": "Industrial", "Percent of Imports": 3.4},
+                {"Product Group": "Mechanical, office and computing machinery", "Category": "Technology", "Percent of Imports": 14.2},
+                {"Product Group": "Electrical machinery and electronic equipment", "Category": "Technology", "Percent of Imports": 16.9},
+                {"Product Group": "Transport equipment", "Category": "Technology", "Percent of Imports": 12.1},
+                {"Product Group": "Other Manufactures", "Category": "Other", "Percent of Imports": 6.7},
+                {"Product Group": "Clothing", "Category": "Other", "Percent of Imports": 2.8}
+            ],
+            2023: [
+                {"Product Group": "Live animals and meat", "Category": "Agricultural", "Percent of Imports": 0.9},
+                {"Product Group": "Dairy products", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Fruits and vegetables", "Category": "Agricultural", "Percent of Imports": 1.8},
+                {"Product Group": "Coffee, tea, cocoa and spices", "Category": "Agricultural", "Percent of Imports": 1.1},
+                {"Product Group": "Cereals and food preparations", "Category": "Agricultural", "Percent of Imports": 0.8},
+                {"Product Group": "Oilseeds, fats and oils", "Category": "Agricultural", "Percent of Imports": 0.5},
+                {"Product Group": "Sugars and confectionery", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Beverages and tobacco", "Category": "Agricultural", "Percent of Imports": 1.2},
+                {"Product Group": "Cotton, silk and wool", "Category": "Agricultural", "Percent of Imports": 0.1},
+                {"Product Group": "Other agricultural products", "Category": "Agricultural", "Percent of Imports": 0.8},
+                {"Product Group": "Fish and fish products", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Minerals and metals", "Category": "Raw Materials", "Percent of Imports": 11.5},
+                {"Product Group": "Petroleum", "Category": "Raw Materials", "Percent of Imports": 8.9},
+                {"Product Group": "Chemicals", "Category": "Industrial", "Percent of Imports": 10.1},
+                {"Product Group": "Wood, paper, furniture", "Category": "Industrial", "Percent of Imports": 3.5},
+                {"Product Group": "Textiles", "Category": "Industrial", "Percent of Imports": 1.5},
+                {"Product Group": "Rubber, leather and footwear", "Category": "Industrial", "Percent of Imports": 3.5},
+                {"Product Group": "Mechanical, office and computing machinery", "Category": "Technology", "Percent of Imports": 14.5},
+                {"Product Group": "Electrical machinery and electronic equipment", "Category": "Technology", "Percent of Imports": 16.8},
+                {"Product Group": "Transport equipment", "Category": "Technology", "Percent of Imports": 12.7},
+                {"Product Group": "Other Manufactures", "Category": "Other", "Percent of Imports": 6.5},
+                {"Product Group": "Clothing", "Category": "Other", "Percent of Imports": 2.7}
+            ],
+            2024: [
+                {"Product Group": "Live animals and meat", "Category": "Agricultural", "Percent of Imports": 0.8},
+                {"Product Group": "Dairy products", "Category": "Agricultural", "Percent of Imports": 0.2},
+                {"Product Group": "Fruits and vegetables", "Category": "Agricultural", "Percent of Imports": 1.7},
+                {"Product Group": "Coffee, tea, cocoa and spices", "Category": "Agricultural", "Percent of Imports": 1.2},
+                {"Product Group": "Cereals and food preparations", "Category": "Agricultural", "Percent of Imports": 0.9},
+                {"Product Group": "Oilseeds, fats and oils", "Category": "Agricultural", "Percent of Imports": 0.5},
+                {"Product Group": "Sugars and confectionery", "Category": "Agricultural", "Percent of Imports": 0.3},
+                {"Product Group": "Beverages and tobacco", "Category": "Agricultural", "Percent of Imports": 1.2},
+                {"Product Group": "Cotton, silk and wool", "Category": "Agricultural", "Percent of Imports": 0.1},
+                {"Product Group": "Other agricultural products", "Category": "Agricultural", "Percent of Imports": 0.9},
+                {"Product Group": "Fish and fish products", "Category": "Agricultural", "Percent of Imports": 0.4},
+                {"Product Group": "Minerals and metals", "Category": "Raw Materials", "Percent of Imports": 11.4},
+                {"Product Group": "Petroleum", "Category": "Raw Materials", "Percent of Imports": 8.6},
+                {"Product Group": "Chemicals", "Category": "Industrial", "Percent of Imports": 10.3},
+                {"Product Group": "Wood, paper, furniture", "Category": "Industrial", "Percent of Imports": 3.3},
+                {"Product Group": "Textiles", "Category": "Industrial", "Percent of Imports": 1.4},
+                {"Product Group": "Rubber, leather and footwear", "Category": "Industrial", "Percent of Imports": 3.6},
+                {"Product Group": "Mechanical, office and computing machinery", "Category": "Technology", "Percent of Imports": 14.4},
+                {"Product Group": "Electrical machinery and electronic equipment", "Category": "Technology", "Percent of Imports": 17.1},
+                {"Product Group": "Transport equipment", "Category": "Technology", "Percent of Imports": 13.0},
+                {"Product Group": "Other Manufactures", "Category": "Other", "Percent of Imports": 6.6},
+                {"Product Group": "Clothing", "Category": "Other", "Percent of Imports": 2.6}
+            ]
+        }
         
-        # Create a copy of the DataFrame before any operations
-        df_copy = product_group_df.copy()
+        # Ensure selected_year is an integer - handle any type conversion issues
+        try:
+            selected_year_int = int(selected_year)
+        except (ValueError, TypeError):
+            selected_year_int = 2022  # Default to 2022 if conversion fails
         
-        # Explicitly convert Year column to integer
-        df_copy['Year'] = df_copy['Year'].astype(int)
+        # Default to closest available year if selected year is not in the dataset
+        if selected_year_int not in hard_coded_data:
+            available_years = sorted(list(hard_coded_data.keys()))
+            if selected_year_int < min(available_years):
+                selected_year_int = min(available_years)
+            elif selected_year_int > max(available_years):
+                selected_year_int = max(available_years)
+            else:
+                # Find the closest year
+                selected_year_int = min(available_years, key=lambda x: abs(x - selected_year_int))
+            
+        # Get data for selected year
+        year_data = hard_coded_data[selected_year_int]
         
-        # Filter data for selected year - avoid chained operations
-        mask = df_copy['Year'] == selected_year
-        filtered_df = df_copy[mask].copy()
+        # Create a DataFrame without chained operations
+        plot_df = pd.DataFrame(year_data)
         
-        print(f"Filtered DataFrame has {len(filtered_df)} rows for year {selected_year}")
+        # Create percent text column directly
+        percent_text_list = []
+        for idx, row in plot_df.iterrows():
+            percent = row['Percent of Imports']
+            percent_text_list.append(f"{percent:.1f}%")
+        
+        # Add the percent text column to the DataFrame
+        plot_df['Percent Text'] = percent_text_list
         
         # Check if we have data
-        if filtered_df.empty:
+        if len(plot_df) == 0:
             # Create empty figure with message
             fig = go.Figure()
             fig.add_annotation(
-                text=f"No import data available for {selected_year}",
+                text=f"No import data available for {selected_year_int}",
                 xref="paper", yref="paper",
                 x=0.5, y=0.5, showarrow=False,
                 font=dict(size=30, color=colors['dark_blue'])
             )
             fig.update_layout(
-                title=f'US Import Distribution by Product Group ({selected_year})',
+                title=f'US Import Distribution by Product Group ({selected_year_int})',
                 title_font_color=colors['dark_blue'],
                 title_font_size=30,
                 height=800,
@@ -1096,34 +1357,6 @@ def update_treemap(selected_year):
                                 style={'textAlign': 'center', 'padding': '50px', 'color': colors['dark_blue'], 'fontSize': '24px'})
             return fig, stats_html
         
-        # Add category if it doesn't exist
-        if 'Category' not in filtered_df.columns:
-            product_categories = {
-                'Agricultural': ['Live animals and meat', 'Dairy products', 'Fruits and vegetables', 
-                                'Coffee, tea, cocoa and spices', 'Cereals and food preparations', 
-                                'Oilseeds, fats and oils', 'Sugars and confectionery', 
-                                'Beverages and tobacco', 'Cotton, silk and wool', 
-                                'Other agricultural products', 'Fish and fish products'],
-                'Raw Materials': ['Minerals and metals', 'Petroleum'],
-                'Industrial': ['Chemicals', 'Wood, paper, furniture', 'Textiles', 'Rubber, leather and footwear'],
-                'Technology': ['Mechanical, office and computing machinery', 
-                              'Electrical machinery and electronic equipment', 'Transport equipment'],
-                'Other': ['Other Manufactures', 'Clothing']
-            }
-            def assign_category(product_group):
-                for category, products in product_categories.items():
-                    if product_group in products:
-                        return category
-                return 'Other'
-            # Apply without chaining
-            filtered_df['Category'] = filtered_df['Product Group'].apply(assign_category)
-        
-        # Create a copy with the calculated fields
-        plot_df = filtered_df.copy()
-        
-        # Handle percentage formatting safely
-        plot_df['Percent for Plot'] = plot_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%")
-        
         # Create basic treemap
         fig = px.treemap(
             plot_df,
@@ -1131,14 +1364,11 @@ def update_treemap(selected_year):
             values='Percent of Imports',
             color='Percent of Imports',
             color_continuous_scale='Blues',
-            hover_data={
-                'Percent of Imports': ':.1f%'
-            },
-            custom_data=['Percent for Plot'],
-            title=f'US Import Distribution by Product Group ({selected_year})'
+            custom_data=['Percent Text'],
+            title=f'US Import Distribution by Product Group ({selected_year_int})'
         )
         
-        # Set hovertemplate to only show percentage of imports
+        # Set hovertemplate to only show percentage
         fig.update_traces(
             hovertemplate='<b>%{label}</b><br>%{customdata[0]}<extra></extra>'
         )
@@ -1152,11 +1382,33 @@ def update_treemap(selected_year):
             font=dict(family='Roboto', size=14, color='#ffffff')
         )
         
-        # Statistics for tables - avoid chained operations
-        grouped = filtered_df.groupby('Category')['Percent of Imports'].sum()
-        top_categories = grouped.sort_values(ascending=False)
-        sorted_df = filtered_df.sort_values('Percent of Imports', ascending=False)
-        top_products = sorted_df.head(5)
+        # Calculate category totals without using groupby
+        category_totals = {}
+        for idx, row in plot_df.iterrows():
+            category = row['Category']
+            percent = row['Percent of Imports']
+            
+            if category in category_totals:
+                category_totals[category] += percent
+            else:
+                category_totals[category] = percent
+        
+        # Prepare categories for stats
+        categories_data = []
+        for category, total in category_totals.items():
+            categories_data.append({
+                'Category': category,
+                'Percent of Imports': total
+            })
+        
+        # Create DataFrame for categories and sort it
+        categories_df = pd.DataFrame(categories_data)
+        categories_df = categories_df.sort_values('Percent of Imports', ascending=False)
+        
+        # Sort products and get top products without chained operations
+        products_df = plot_df.copy()
+        products_df = products_df.sort_values('Percent of Imports', ascending=False)
+        top_products = products_df.head(5)
         
         # Styling for tables
         table_header_style = {
@@ -1196,6 +1448,26 @@ def update_treemap(selected_year):
             'boxShadow': '0 4px 12px rgba(0, 0, 0, 0.3)'  # More pronounced shadow
         }
         
+        # Build categories table rows directly
+        category_rows = []
+        for idx, row in categories_df.iterrows():
+            category_rows.append(
+                html.Tr([
+                    html.Td(row['Category'], style=table_cell_style), 
+                    html.Td(f"{row['Percent of Imports']:.1f}%", style=percent_cell_style)
+                ], style={'hover': {'backgroundColor': '#2d3748'}})
+            )
+            
+        # Build product table rows directly
+        product_rows = []
+        for idx, row in top_products.iterrows():
+            product_rows.append(
+                html.Tr([
+                    html.Td(row['Product Group'], style=table_cell_style), 
+                    html.Td(row['Percent Text'], style=percent_cell_style)
+                ], style={'hover': {'backgroundColor': '#2d3748'}})
+            )
+        
         # Create statistics HTML with hover effects
         stats_html = [
             html.Div([
@@ -1213,13 +1485,7 @@ def update_treemap(selected_year):
                             html.Th("Category", style=table_header_style), 
                             html.Th("% of Imports", style={**table_header_style, 'textAlign': 'right'})
                         ])),
-                        html.Tbody([
-                            html.Tr([
-                                html.Td(category, style=table_cell_style), 
-                                html.Td(f"{value:.1f}%".replace(',', '.'), style=percent_cell_style)
-                            ], style={'hover': {'backgroundColor': '#2d3748'}})  # Hover style
-                            for category, value in top_categories.items()
-                        ])
+                        html.Tbody(category_rows)
                     ], style=table_style)
                 ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
                 
@@ -1237,13 +1503,7 @@ def update_treemap(selected_year):
                             html.Th("Product Group", style=table_header_style), 
                             html.Th("% of Imports", style={**table_header_style, 'textAlign': 'right'})
                         ])),
-                        html.Tbody([
-                            html.Tr([
-                                html.Td(row['Product Group'], style=table_cell_style), 
-                                html.Td(f"{row['Percent of Imports']:.1f}%".replace(',', '.'), style=percent_cell_style)
-                            ], style={'hover': {'backgroundColor': '#2d3748'}})  # Hover style
-                            for _, row in top_products.iterrows()
-                        ])
+                        html.Tbody(product_rows)
                     ], style=table_style)
                 ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top', 'marginLeft': '4%'})
             ], style={'padding': '15px 0'})
@@ -1265,7 +1525,7 @@ def update_treemap(selected_year):
             font=dict(size=20, color='red')
         )
         fig.update_layout(
-            title=f'US Import Distribution by Product Group ({selected_year})',
+            title=f'US Import Distribution by Product Group',
             height=800,
             plot_bgcolor='rgba(45, 45, 45, 0.5)',
             paper_bgcolor=colors['card']
@@ -1285,28 +1545,8 @@ def update_treemap(selected_year):
     [Input('treemap-year-slider', 'value')]
 )
 def update_treemap_explanation(selected_year):
-    explanation_text = [
-        html.P(f"This treemap visualizes the distribution of US imports across different product categories for {selected_year}.", 
-              style={'fontSize': '16px', 'marginBottom': '15px'}),
-        html.P("The size of each block represents the percentage of total imports for the corresponding product group. Darker blue shades indicate higher import percentages.",
-              style={'fontSize': '16px', 'marginBottom': '15px'}),
-        html.P("Products are organized hierarchically by category (Agricultural, Raw Materials, Industrial, Technology, and Other) and then by specific product groups within each category.",
-              style={'fontSize': '16px', 'marginBottom': '15px'}),
-        html.P([
-            "How to use this dashboard: ",
-            html.Ul([
-                html.Li("Use the year slider to view import distributions for different years", 
-                      style={'fontSize': '16px', 'marginBottom': '10px'}),
-                html.Li("Hover over treemap sections to see detailed import percentages and tariff rates", 
-                      style={'fontSize': '16px', 'marginBottom': '10px'}),
-                html.Li("Refer to the statistics tables below for a summary of top import categories and specific product groups", 
-                      style={'fontSize': '16px', 'marginBottom': '10px'}),
-                html.Li("Compare the changes in import patterns across different years to identify trends", 
-                      style={'fontSize': '16px', 'marginBottom': '10px'})
-            ])
-        ], style={'fontSize': '16px', 'marginBottom': '15px'})
-    ]
-    return explanation_text
+    # Simple empty placeholder since the explanation is not needed
+    return html.Div([])
 
 # Update the scatter plot layout
 def update_scatter_layout(fig):
