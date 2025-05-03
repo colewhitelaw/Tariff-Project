@@ -1128,12 +1128,18 @@ def update_treemap(selected_year):
             hover_template = "<b>%{label}</b><br>Import: %{text}<extra></extra>"
             custom_data = None
         
+        # Create lists for treemap with a single root
+        labels = ['US Imports'] + filtered_df['Category'].tolist() + filtered_df['Product Group'].tolist()
+        parents = [''] + ['US Imports'] * len(filtered_df['Category'].unique()) + filtered_df['Category'].tolist()
+        values = [filtered_df['Percent for Treemap'].sum()] + [filtered_df[filtered_df['Category'] == cat]['Percent for Treemap'].sum() for cat in filtered_df['Category'].unique()] + filtered_df['Percent for Treemap'].tolist()
+        text = [''] + [''] * len(filtered_df['Category'].unique()) + filtered_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%").tolist()
+        
         # Create the treemap using graph_objects
         fig = go.Figure(go.Treemap(
-            labels=filtered_df['Product Group'].tolist(),
-            parents=filtered_df['Category'].tolist(),
-            values=filtered_df['Percent for Treemap'].tolist(),
-            text=filtered_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%").tolist(),
+            labels=labels,
+            parents=parents,
+            values=values,
+            text=text,
             textinfo="label+text",
             hovertemplate=hover_template,
             customdata=custom_data,
