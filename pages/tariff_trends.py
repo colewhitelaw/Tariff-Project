@@ -1059,11 +1059,19 @@ def update_import_share_explanation(selected_countries):
 )
 def update_treemap(selected_year):
     try:
+        # Add debug information
+        print(f"Selected year: {selected_year}")
+        print(f"DataFrame columns: {product_group_df.columns.tolist()}")
+        print(f"DataFrame shape: {product_group_df.shape}")
+        
         # Filter data by selected year
         filtered_df = product_group_df[product_group_df['Year'] == selected_year].copy()
+        print(f"Filtered DataFrame shape: {filtered_df.shape}")
+        print(f"Filtered DataFrame columns: {filtered_df.columns.tolist()}")
         
         # Check if we have valid data for this year
         if filtered_df.empty or filtered_df['Percent of Imports'].sum() == 0:
+            print("No data available for selected year")
             # Create an empty figure with a message
             fig = go.Figure()
             fig.add_annotation(
@@ -1088,6 +1096,10 @@ def update_treemap(selected_year):
                                 style={'textAlign': 'center', 'padding': '50px', 'color': colors['dark_blue'], 'fontSize': '24px'})
             return fig, stats_html
         
+        # Print category information
+        print(f"Unique categories: {filtered_df['Category'].unique()}")
+        print(f"Category counts: {filtered_df['Category'].value_counts()}")
+        
         # Classify products into categories for the treemap hierarchy
         product_categories = {
             'Agricultural': ['Live animals and meat', 'Dairy products', 'Fruits and vegetables', 
@@ -1111,6 +1123,10 @@ def update_treemap(selected_year):
         
         filtered_df['Category'] = filtered_df['Product Group'].apply(assign_category)
         
+        # Print category assignment results
+        print(f"Assigned categories: {filtered_df['Category'].unique()}")
+        print(f"Assigned category counts: {filtered_df['Category'].value_counts()}")
+        
         # Make sure each product has at least a small positive value for the treemap
         min_value = 0.001  # Small positive value
         filtered_df['Percent for Treemap'] = filtered_df['Percent of Imports'].apply(
@@ -1119,6 +1135,7 @@ def update_treemap(selected_year):
         
         # Check if tariff rate columns exist
         has_tariff_rates = all(col in filtered_df.columns for col in ['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate'])
+        print(f"Has tariff rates: {has_tariff_rates}")
         
         # Create hover template based on available data
         if has_tariff_rates:
@@ -1128,11 +1145,31 @@ def update_treemap(selected_year):
             hover_template = "<b>%{label}</b><br>Import: %{text}<extra></extra>"
             custom_data = None
         
-        # Create lists for treemap with a single root
-        labels = ['US Imports'] + filtered_df['Category'].tolist() + filtered_df['Product Group'].tolist()
-        parents = [''] + ['US Imports'] * len(filtered_df['Category'].unique()) + filtered_df['Category'].tolist()
-        values = [filtered_df['Percent for Treemap'].sum()] + [filtered_df[filtered_df['Category'] == cat]['Percent for Treemap'].sum() for cat in filtered_df['Category'].unique()] + filtered_df['Percent for Treemap'].tolist()
-        text = [''] + [''] * len(filtered_df['Category'].unique()) + filtered_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%").tolist()
+        # Create lists for treemap with a single root and unique labels
+        root_label = "US Imports"
+        category_labels = [f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)" 
+                         for cat in filtered_df['Category'].unique()]
+        product_labels = filtered_df['Product Group'].tolist()
+        
+        # Print hierarchy information
+        print(f"Root label: {root_label}")
+        print(f"Category labels: {category_labels}")
+        print(f"Number of product labels: {len(product_labels)}")
+        
+        labels = [root_label] + category_labels + product_labels
+        parents = [''] + [root_label] * len(category_labels) + [f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)" 
+                                                              for cat in filtered_df['Category']]
+        values = [filtered_df['Percent for Treemap'].sum()] + \
+                [filtered_df[filtered_df['Category'] == cat]['Percent for Treemap'].sum() 
+                 for cat in filtered_df['Category'].unique()] + \
+                filtered_df['Percent for Treemap'].tolist()
+        text = [''] + [''] * len(category_labels) + filtered_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%").tolist()
+        
+        # Print hierarchy structure
+        print(f"Labels length: {len(labels)}")
+        print(f"Parents length: {len(parents)}")
+        print(f"Values length: {len(values)}")
+        print(f"Text length: {len(text)}")
         
         # Create the treemap using graph_objects
         fig = go.Figure(go.Treemap(
@@ -1244,6 +1281,11 @@ def update_treemap(selected_year):
         return fig, stats_html
         
     except Exception as e:
+        # Print the full error traceback
+        import traceback
+        print(f"Error in update_treemap: {str(e)}")
+        print(traceback.format_exc())
+        
         # Create an error figure
         fig = go.Figure()
         fig.add_annotation(
