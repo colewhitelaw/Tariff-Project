@@ -1103,28 +1103,47 @@ def update_treemap(selected_year):
         has_tariff_rates = all(col in filtered_df.columns for col in ['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate'])
         root_label = "US Imports"
         categories = filtered_df['Category'].unique().tolist()
-        # Build category label mapping for exact match
+        # Build category label mapping
         category_label_map = {}
-        category_labels = []
         for cat in categories:
             label = f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)"
             category_label_map[cat] = label
-            category_labels.append(label)
-        product_labels = filtered_df['Product Group'].tolist()
-        labels = [root_label] + category_labels + product_labels
-        parents = [''] + [root_label] * len(category_labels) + [category_label_map[cat] for cat in filtered_df['Category']]
-        values = [None]*(1+len(category_labels)) + filtered_df['Percent for Treemap'].tolist()
-        colors_arr = [None]*(1+len(category_labels)) + filtered_df['Percent of Imports'].tolist()
-        if has_tariff_rates:
-            customdata_arr = [None]*(1+len(category_labels)) + filtered_df[['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate']].values.tolist()
-        else:
-            customdata_arr = [None]*(1+len(category_labels)) + [[None, None]]*len(product_labels)
-        text_arr = ['']*(1+len(category_labels)) + filtered_df['Percent of Imports'].apply(lambda x: f"{x:.1f}%").tolist()
-        hovertemplate_arr = ['<b>%{label}</b><extra></extra>']*(1+len(category_labels))
-        if has_tariff_rates:
-            hovertemplate_arr += ["<b>%{label}</b><br>Import: %{text}<br>MFN Tariff: %{customdata[0]:.1f}%<br>Bound Tariff: %{customdata[1]:.1f}%<extra></extra>"]*len(product_labels)
-        else:
-            hovertemplate_arr += ["<b>%{label}</b><br>Import: %{text}<extra></extra>"]*len(product_labels)
+        # Build node lists
+        nodes = []
+        # Root node
+        nodes.append({'label': root_label, 'parent': '', 'value': None, 'color': None, 'customdata': None, 'text': ''})
+        # Category nodes
+        for cat in categories:
+            nodes.append({'label': category_label_map[cat], 'parent': root_label, 'value': None, 'color': None, 'customdata': None, 'text': ''})
+        # Product group nodes
+        for _, row in filtered_df.iterrows():
+            cat_label = category_label_map[row['Category']]
+            value = max(row['Percent of Imports'], 0.001)
+            color = row['Percent of Imports']
+            text = f"{row['Percent of Imports']:.1f}%"
+            if has_tariff_rates:
+                customdata = [row['MFN Average Tariff Rate'], row['Final Bound Average Tariff Rate']]
+            else:
+                customdata = [None, None]
+            nodes.append({'label': row['Product Group'], 'parent': cat_label, 'value': value, 'color': color, 'customdata': customdata, 'text': text})
+        # Extract arrays
+        labels = [n['label'] for n in nodes]
+        parents = [n['parent'] for n in nodes]
+        values = [n['value'] for n in nodes]
+        colors_arr = [n['color'] for n in nodes]
+        customdata_arr = [n['customdata'] for n in nodes]
+        text_arr = [n['text'] for n in nodes]
+        hovertemplate_arr = []
+        for n in nodes:
+            if n['parent'] == root_label:
+                hovertemplate_arr.append('<b>%{label}</b><extra></extra>')
+            elif n['parent'] in category_label_map.values():
+                if has_tariff_rates:
+                    hovertemplate_arr.append("<b>%{label}</b><br>Import: %{text}<br>MFN Tariff: %{customdata[0]:.1f}%<br>Bound Tariff: %{customdata[1]:.1f}%<extra></extra>")
+                else:
+                    hovertemplate_arr.append("<b>%{label}</b><br>Import: %{text}<extra></extra>")
+            else:
+                hovertemplate_arr.append('<b>%{label}</b><extra></extra>')
         fig = go.Figure(go.Treemap(
             labels=labels,
             parents=parents,
