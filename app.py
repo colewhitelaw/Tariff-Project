@@ -89,5 +89,8 @@ server = app.server
 def create_app():
     return app.server
 
+# Make the app directly callable
+app = app.server
+
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8050))) 
