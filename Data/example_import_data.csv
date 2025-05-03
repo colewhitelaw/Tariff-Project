@@ -1,0 +1,181 @@
+Year,Product_Type,Category,Import_Volume_Billion_USD
+2015,Agricultural Products,Duty-free (No Tariff),45.2
+2015,Agricultural Products,0 <= 5% Tariff,37.8
+2015,Agricultural Products,5 <= 10% Tariff,18.5
+2015,Agricultural Products,10 <= 15% Tariff,12.3
+2015,Agricultural Products,15 <= 25% Tariff,8.7
+2015,Agricultural Products,25 <= 50% Tariff,5.2
+2015,Agricultural Products,50 <= 100% Tariff,1.5
+2015,Agricultural Products,> 100 % Tariff,0.8
+2015,Agricultural Products,Non-Ad Valorem Duties,22.6
+2015,Non-agricultural Products,Duty-free (No Tariff),985.3
+2015,Non-agricultural Products,0 <= 5% Tariff,562.1
+2015,Non-agricultural Products,5 <= 10% Tariff,352.4
+2015,Non-agricultural Products,10 <= 15% Tariff,98.7
+2015,Non-agricultural Products,15 <= 25% Tariff,42.3
+2015,Non-agricultural Products,25 <= 50% Tariff,12.8
+2015,Non-agricultural Products,50 <= 100% Tariff,0.0
+2015,Non-agricultural Products,> 100 % Tariff,0.0
+2015,Non-agricultural Products,Non-Ad Valorem Duties,65.4
+2016,Agricultural Products,Duty-free (No Tariff),46.3
+2016,Agricultural Products,0 <= 5% Tariff,38.2
+2016,Agricultural Products,5 <= 10% Tariff,19.1
+2016,Agricultural Products,10 <= 15% Tariff,11.8
+2016,Agricultural Products,15 <= 25% Tariff,8.5
+2016,Agricultural Products,25 <= 50% Tariff,4.9
+2016,Agricultural Products,50 <= 100% Tariff,1.4
+2016,Agricultural Products,> 100 % Tariff,0.7
+2016,Agricultural Products,Non-Ad Valorem Duties,23.1
+2016,Non-agricultural Products,Duty-free (No Tariff),963.2
+2016,Non-agricultural Products,0 <= 5% Tariff,538.7
+2016,Non-agricultural Products,5 <= 10% Tariff,341.8
+2016,Non-agricultural Products,10 <= 15% Tariff,94.2
+2016,Non-agricultural Products,15 <= 25% Tariff,38.6
+2016,Non-agricultural Products,25 <= 50% Tariff,11.3
+2016,Non-agricultural Products,50 <= 100% Tariff,0.0
+2016,Non-agricultural Products,> 100 % Tariff,0.0
+2016,Non-agricultural Products,Non-Ad Valorem Duties,62.7
+2017,Agricultural Products,Duty-free (No Tariff),47.5
+2017,Agricultural Products,0 <= 5% Tariff,39.6
+2017,Agricultural Products,5 <= 10% Tariff,18.3
+2017,Agricultural Products,10 <= 15% Tariff,11.2
+2017,Agricultural Products,15 <= 25% Tariff,7.9
+2017,Agricultural Products,25 <= 50% Tariff,4.3
+2017,Agricultural Products,50 <= 100% Tariff,1.2
+2017,Agricultural Products,> 100 % Tariff,0.6
+2017,Agricultural Products,Non-Ad Valorem Duties,22.8
+2017,Non-agricultural Products,Duty-free (No Tariff),1025.6
+2017,Non-agricultural Products,0 <= 5% Tariff,572.3
+2017,Non-agricultural Products,5 <= 10% Tariff,365.8
+2017,Non-agricultural Products,10 <= 15% Tariff,101.5
+2017,Non-agricultural Products,15 <= 25% Tariff,40.2
+2017,Non-agricultural Products,25 <= 50% Tariff,10.7
+2017,Non-agricultural Products,50 <= 100% Tariff,0.0
+2017,Non-agricultural Products,> 100 % Tariff,0.0
+2017,Non-agricultural Products,Non-Ad Valorem Duties,67.8
+2018,Agricultural Products,Duty-free (No Tariff),48.9
+2018,Agricultural Products,0 <= 5% Tariff,41.2
+2018,Agricultural Products,5 <= 10% Tariff,17.5
+2018,Agricultural Products,10 <= 15% Tariff,10.8
+2018,Agricultural Products,15 <= 25% Tariff,7.3
+2018,Agricultural Products,25 <= 50% Tariff,3.8
+2018,Agricultural Products,50 <= 100% Tariff,1.0
+2018,Agricultural Products,> 100 % Tariff,0.5
+2018,Agricultural Products,Non-Ad Valorem Duties,21.5
+2018,Non-agricultural Products,Duty-free (No Tariff),1053.8
+2018,Non-agricultural Products,0 <= 5% Tariff,558.7
+2018,Non-agricultural Products,5 <= 10% Tariff,342.1
+2018,Non-agricultural Products,10 <= 15% Tariff,95.3
+2018,Non-agricultural Products,15 <= 25% Tariff,38.7
+2018,Non-agricultural Products,25 <= 50% Tariff,8.9
+2018,Non-agricultural Products,50 <= 100% Tariff,0.0
+2018,Non-agricultural Products,> 100 % Tariff,0.0
+2018,Non-agricultural Products,Non-Ad Valorem Duties,65.1
+2019,Agricultural Products,Duty-free (No Tariff),49.8
+2019,Agricultural Products,0 <= 5% Tariff,40.6
+2019,Agricultural Products,5 <= 10% Tariff,16.9
+2019,Agricultural Products,10 <= 15% Tariff,10.2
+2019,Agricultural Products,15 <= 25% Tariff,6.8
+2019,Agricultural Products,25 <= 50% Tariff,3.5
+2019,Agricultural Products,50 <= 100% Tariff,0.9
+2019,Agricultural Products,> 100 % Tariff,0.4
+2019,Agricultural Products,Non-Ad Valorem Duties,20.7
+2019,Non-agricultural Products,Duty-free (No Tariff),1008.5
+2019,Non-agricultural Products,0 <= 5% Tariff,532.1
+2019,Non-agricultural Products,5 <= 10% Tariff,321.9
+2019,Non-agricultural Products,10 <= 15% Tariff,88.6
+2019,Non-agricultural Products,15 <= 25% Tariff,35.2
+2019,Non-agricultural Products,25 <= 50% Tariff,7.5
+2019,Non-agricultural Products,50 <= 100% Tariff,0.0
+2019,Non-agricultural Products,> 100 % Tariff,0.0
+2019,Non-agricultural Products,Non-Ad Valorem Duties,62.3
+2020,Agricultural Products,Duty-free (No Tariff),51.2
+2020,Agricultural Products,0 <= 5% Tariff,39.8
+2020,Agricultural Products,5 <= 10% Tariff,16.2
+2020,Agricultural Products,10 <= 15% Tariff,9.7
+2020,Agricultural Products,15 <= 25% Tariff,6.2
+2020,Agricultural Products,25 <= 50% Tariff,3.1
+2020,Agricultural Products,50 <= 100% Tariff,0.8
+2020,Agricultural Products,> 100 % Tariff,0.3
+2020,Agricultural Products,Non-Ad Valorem Duties,19.8
+2020,Non-agricultural Products,Duty-free (No Tariff),962.3
+2020,Non-agricultural Products,0 <= 5% Tariff,498.5
+2020,Non-agricultural Products,5 <= 10% Tariff,289.6
+2020,Non-agricultural Products,10 <= 15% Tariff,77.2
+2020,Non-agricultural Products,15 <= 25% Tariff,30.8
+2020,Non-agricultural Products,25 <= 50% Tariff,6.4
+2020,Non-agricultural Products,50 <= 100% Tariff,0.0
+2020,Non-agricultural Products,> 100 % Tariff,0.0
+2020,Non-agricultural Products,Non-Ad Valorem Duties,57.9
+2021,Agricultural Products,Duty-free (No Tariff),55.8
+2021,Agricultural Products,0 <= 5% Tariff,42.7
+2021,Agricultural Products,5 <= 10% Tariff,17.9
+2021,Agricultural Products,10 <= 15% Tariff,10.8
+2021,Agricultural Products,15 <= 25% Tariff,6.7
+2021,Agricultural Products,25 <= 50% Tariff,3.3
+2021,Agricultural Products,50 <= 100% Tariff,0.9
+2021,Agricultural Products,> 100 % Tariff,0.4
+2021,Agricultural Products,Non-Ad Valorem Duties,22.3
+2021,Non-agricultural Products,Duty-free (No Tariff),1125.6
+2021,Non-agricultural Products,0 <= 5% Tariff,582.4
+2021,Non-agricultural Products,5 <= 10% Tariff,352.7
+2021,Non-agricultural Products,10 <= 15% Tariff,96.8
+2021,Non-agricultural Products,15 <= 25% Tariff,37.5
+2021,Non-agricultural Products,25 <= 50% Tariff,7.9
+2021,Non-agricultural Products,50 <= 100% Tariff,0.0
+2021,Non-agricultural Products,> 100 % Tariff,0.0
+2021,Non-agricultural Products,Non-Ad Valorem Duties,67.2
+2022,Agricultural Products,Duty-free (No Tariff),58.2
+2022,Agricultural Products,0 <= 5% Tariff,44.3
+2022,Agricultural Products,5 <= 10% Tariff,18.5
+2022,Agricultural Products,10 <= 15% Tariff,11.2
+2022,Agricultural Products,15 <= 25% Tariff,6.9
+2022,Agricultural Products,25 <= 50% Tariff,3.4
+2022,Agricultural Products,50 <= 100% Tariff,0.95
+2022,Agricultural Products,> 100 % Tariff,0.45
+2022,Agricultural Products,Non-Ad Valorem Duties,23.1
+2022,Non-agricultural Products,Duty-free (No Tariff),1183.2
+2022,Non-agricultural Products,0 <= 5% Tariff,612.8
+2022,Non-agricultural Products,5 <= 10% Tariff,371.4
+2022,Non-agricultural Products,10 <= 15% Tariff,102.5
+2022,Non-agricultural Products,15 <= 25% Tariff,39.8
+2022,Non-agricultural Products,25 <= 50% Tariff,8.5
+2022,Non-agricultural Products,50 <= 100% Tariff,0.0
+2022,Non-agricultural Products,> 100 % Tariff,0.0
+2022,Non-agricultural Products,Non-Ad Valorem Duties,71.3
+2023,Agricultural Products,Duty-free (No Tariff),59.7
+2023,Agricultural Products,0 <= 5% Tariff,45.1
+2023,Agricultural Products,5 <= 10% Tariff,18.9
+2023,Agricultural Products,10 <= 15% Tariff,11.5
+2023,Agricultural Products,15 <= 25% Tariff,7.1
+2023,Agricultural Products,25 <= 50% Tariff,3.5
+2023,Agricultural Products,50 <= 100% Tariff,0.98
+2023,Agricultural Products,> 100 % Tariff,0.48
+2023,Agricultural Products,Non-Ad Valorem Duties,23.8
+2023,Non-agricultural Products,Duty-free (No Tariff),1167.5
+2023,Non-agricultural Products,0 <= 5% Tariff,598.3
+2023,Non-agricultural Products,5 <= 10% Tariff,357.8
+2023,Non-agricultural Products,10 <= 15% Tariff,98.2
+2023,Non-agricultural Products,15 <= 25% Tariff,37.4
+2023,Non-agricultural Products,25 <= 50% Tariff,7.9
+2023,Non-agricultural Products,50 <= 100% Tariff,0.0
+2023,Non-agricultural Products,> 100 % Tariff,0.0
+2023,Non-agricultural Products,Non-Ad Valorem Duties,68.7
+2024,Agricultural Products,Duty-free (No Tariff),61.2
+2024,Agricultural Products,0 <= 5% Tariff,46.3
+2024,Agricultural Products,5 <= 10% Tariff,19.5
+2024,Agricultural Products,10 <= 15% Tariff,11.8
+2024,Agricultural Products,15 <= 25% Tariff,7.3
+2024,Agricultural Products,25 <= 50% Tariff,3.6
+2024,Agricultural Products,50 <= 100% Tariff,1.0
+2024,Agricultural Products,> 100 % Tariff,0.5
+2024,Agricultural Products,Non-Ad Valorem Duties,24.5
+2024,Non-agricultural Products,Duty-free (No Tariff),1198.6
+2024,Non-agricultural Products,0 <= 5% Tariff,617.5
+2024,Non-agricultural Products,5 <= 10% Tariff,369.2
+2024,Non-agricultural Products,10 <= 15% Tariff,101.7
+2024,Non-agricultural Products,15 <= 25% Tariff,38.6
+2024,Non-agricultural Products,25 <= 50% Tariff,8.2
+2024,Non-agricultural Products,50 <= 100% Tariff,0.0
+2024,Non-agricultural Products,> 100 % Tariff,0.0
+2024,Non-agricultural Products,Non-Ad Valorem Duties,70.9 

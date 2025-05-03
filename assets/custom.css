@@ -1,0 +1,150 @@
+/* Custom CSS for Tariff Dashboard */
+
+/* Body and global styles */
+body {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+}
+
+/* Card styling */
+.card {
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 1rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Navbar styling */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.nav-link:hover {
+    transform: translateY(-2px);
+}
+
+/* Slider customization */
+.rc-slider-track {
+    background-color: #2986cc !important;
+}
+
+.rc-slider-handle {
+    border-color: #2986cc !important;
+    background-color: #2986cc !important;
+}
+
+/* Dropdown styling */
+.Select-control {
+    background-color: #34495e !important;
+    border-color: #455a6f !important;
+    color: white !important;
+}
+
+.Select-menu-outer {
+    background-color: #34495e !important;
+    border-color: #455a6f !important;
+}
+
+.Select-option {
+    background-color: #34495e !important;
+    color: white !important;
+}
+
+.Select-option.is-focused {
+    background-color: #455a6f !important;
+}
+
+/* Stats cards animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#stats-container .card {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Footer styling */
+footer {
+    background-color: #1a252f;
+}
+
+/* Dropdown Text Color Override */
+.Select-control {
+    color: white !important;
+}
+
+.Select-value-label {
+    color: white !important;
+}
+
+.Select-placeholder {
+    color: white !important;
+}
+
+.Select-input > input {
+    color: white !important;
+}
+
+.Select--single > .Select-control .Select-value {
+    color: white !important;
+}
+
+.has-value.Select--single > .Select-control .Select-value .Select-value-label {
+    color: white !important;
+}
+
+.Select-menu-outer {
+    color: white !important;
+    background-color: rgba(43, 48, 53, 0.95) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+.Select-option {
+    color: white !important;
+    background: rgba(43, 48, 53, 0.95) !important;
+}
+
+.Select-option.is-focused {
+    background-color: rgba(73, 80, 87, 0.95) !important;
+    color: white !important;
+}
+
+/* Extra specificity for child elements */
+.Select-control * {
+    color: white !important;
+}
+
+/* Force dropdown text white for all states */
+#country-dropdown .Select-value-label, 
+#category-dropdown .Select-value-label,
+#product-dropdown .Select-value-label,
+#country-dropdown input,
+#category-dropdown input,
+#product-dropdown input,
+#country-dropdown .Select-placeholder,
+#category-dropdown .Select-placeholder,
+#product-dropdown .Select-placeholder {
+    color: white !important;
+}
+
+/* Focus outline removal */
+.Select-control:focus {
+    border-color: none !important;
+    box-shadow: none !important;
+} 

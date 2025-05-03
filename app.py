@@ -1,0 +1,87 @@
+import dash
+from dash import dcc, html, Input, Output, callback
+import dash_bootstrap_components as dbc
+import plotly.graph_objects as go
+import plotly.express as px
+import pandas as pd
+import numpy as np
+import pydeck as pdk
+from dash_deck import DeckGL
+# from data import get_tariff_data, get_sp500_data, get_average_tariff_data # Moved to pages/home.py
+import json
+import os
+from dash import page_registry, register_page
+
+# Set your Mapbox access token (get a free token from mapbox.com)
+# Ideally, this would be stored as an environment variable
+# mapbox_token = "pk.eyJ1IjoiY3doaXRlbGEiLCJhIjoiY205dDNndWZiMDcxbTJsb2N2ajllenM3dyJ9.pJq1KBvg-bC0pm842UZzNQ" # Moved to pages/home.py
+# os.environ["MAPBOX_API_KEY"] = mapbox_token # Moved to pages/home.py
+
+# Initialize the app with Bootstrap
+app = dash.Dash(
+    __name__, 
+    external_stylesheets=[dbc.themes.DARKLY, dbc.icons.FONT_AWESOME],
+    use_pages=True,  # Enable pages
+    suppress_callback_exceptions=True  # Suppress callback exceptions
+)
+
+app.title = "Global Tariff Visualization"
+
+# Navbar Definition (Keep this here as it's part of the main layout)
+navbar = dbc.Navbar(
+    dbc.Container(
+        [
+            # Left side - Brand with no margins
+            html.A(
+                dbc.Row(
+                    [
+                        dbc.Col(html.I(className="fas fa-globe fa-2x text-info me-2"), width="auto"),
+                        dbc.Col(dbc.NavbarBrand("Global Tariff Dashboard", className="fw-bold fs-4")),
+                    ],
+                    align="center",
+                    className="g-0", # Remove gutters
+                ),
+                href="/",
+                style={"textDecoration": "none"},
+            ),
+            dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
+            # Right side - Navigation links with improved styling
+            dbc.Collapse(
+                dbc.Nav(
+                    [
+                        dbc.NavItem(dbc.NavLink("Home", href="/", className="px-3 fw-bold text-white", active="exact")),
+                        dbc.NavItem(dbc.NavLink("Business Analytics", href="/business-analytics", className="px-3 fw-bold text-white", active="exact")),
+                        dbc.NavItem(dbc.NavLink("Global Trends", href="/global-trends", className="px-3 fw-bold text-white", active="exact")),
+                        dbc.NavItem(dbc.NavLink("Tariff Trends", href="/tariff-trends", className="px-3 fw-bold text-white", active="exact")),
+                        dbc.NavItem(dbc.NavLink("State Analysis", href="/state-analysis", className="px-3 fw-bold text-white", active="exact")),
+                        dbc.NavItem(dbc.NavLink("About", href="/about", className="px-3 fw-bold text-white", active="exact")),
+                    ],
+                    className="ms-auto",
+                    navbar=True,
+                ),
+                id="navbar-collapse",
+                navbar=True,
+            ),
+        ], 
+        fluid=True, # Make the container full-width
+        className="px-4" # Add horizontal padding
+    ),
+    color="primary",
+    dark=True,
+    className="mb-4 py-2", # Add vertical padding
+)
+
+# App layout
+app.layout = html.Div([
+    navbar,
+    dbc.Container([
+        html.Div(
+            dash.page_container,
+            style={"minHeight": "calc(100vh - 140px)"}
+        )
+    ], fluid=True)
+])
+
+# Run the app
+if __name__ == '__main__':
+    app.run(debug=True) 

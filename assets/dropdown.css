@@ -1,0 +1,64 @@
+/* High-specificity selectors to force white text in dropdowns */
+
+/* Target all Dash dropdown components */
+.dash-dropdown .Select-control,
+.dash-dropdown .Select-menu-outer,
+.dash-dropdown .Select-option,
+.dash-dropdown .Select-placeholder,
+.dash-dropdown .Select-value,
+.dash-dropdown .Select-value-label,
+.dash-dropdown input {
+    color: white !important;
+}
+
+/* Target by ID with high specificity */
+#country-dropdown .Select-control,
+#country-dropdown .Select-value,
+#country-dropdown .Select-value-label,
+#country-dropdown .Select-placeholder,
+#country-dropdown input,
+#category-dropdown .Select-control,
+#category-dropdown .Select-value,
+#category-dropdown .Select-value-label,
+#category-dropdown .Select-placeholder,
+#category-dropdown input,
+#product-dropdown .Select-control,
+#product-dropdown .Select-value,
+#product-dropdown .Select-value-label,
+#product-dropdown .Select-placeholder,
+#product-dropdown input {
+    color: white !important;
+}
+
+/* Even stronger selector for React-Select components */
+div#country-dropdown > div > div.Select-control > span.Select-value > span.Select-value-label,
+div#category-dropdown > div > div.Select-control > span.Select-value > span.Select-value-label,
+div#product-dropdown > div > div.Select-control > span.Select-value > span.Select-value-label {
+    color: white !important;
+}
+
+/* Dropdown background styling */
+.Select-menu-outer {
+    background-color: rgba(43, 48, 53, 0.95) !important;
+    border: none !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+.Select-option {
+    background-color: rgba(43, 48, 53, 0.95) !important;
+}
+
+.Select-option.is-focused, 
+.Select-option:hover {
+    background-color: rgba(73, 80, 87, 0.95) !important;
+}
+
+/* Fix every possible text element */
+.Select * {
+    color: white !important;
+}
+
+/* Override inline styles */
+[style*="color"] {
+    color: white !important;
+} 

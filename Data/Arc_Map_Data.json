@@ -1,0 +1,244 @@
+
+
+{
+  "Canada": {
+    "US_to_Canada": {
+      "total_avg_tariff": 0.0,
+      "agricultural_avg_tariff": 0.0,
+      "non_agricultural_avg_tariff": 0.0
+    },
+    "Canada_to_US": {
+      "total_avg_tariff": 0.0,
+      "agricultural_avg_tariff": 0.0,
+      "non_agricultural_avg_tariff": 0.0
+    }
+  },
+  "Mexico": {
+    "US_to_Mexico": {
+      "total_avg_tariff": 0.0,
+      "agricultural_avg_tariff": 0.0,
+      "non_agricultural_avg_tariff": 0.0
+    },
+    "Mexico_to_US": {
+      "total_avg_tariff": 0.0,
+      "agricultural_avg_tariff": 0.0,
+      "non_agricultural_avg_tariff": 0.0
+    }
+  },
+  "China": {
+    "US_to_China": {
+      "total_avg_tariff": 7.5,
+      "agricultural_avg_tariff": 15.3,
+      "non_agricultural_avg_tariff": 6.5
+    },
+    "China_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Japan": {
+    "US_to_Japan": {
+      "total_avg_tariff": 4.0,
+      "agricultural_avg_tariff": 15.7,
+      "non_agricultural_avg_tariff": 2.5
+    },
+    "Japan_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Germany": {
+    "US_to_Germany": {
+      "total_avg_tariff": 5.5,
+      "agricultural_avg_tariff": 13.7,
+      "non_agricultural_avg_tariff": 4.2
+    },
+    "Germany_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "South Korea": {
+    "US_to_South_Korea": {
+      "total_avg_tariff": 0.0,
+      "agricultural_avg_tariff": 0.0,
+      "non_agricultural_avg_tariff": 0.0
+    },
+    "South_Korea_to_US": {
+      "total_avg_tariff": 0.0,
+      "agricultural_avg_tariff": 0.0,
+      "non_agricultural_avg_tariff": 0.0
+    }
+  },
+  "India": {
+    "US_to_India": {
+      "total_avg_tariff": 17.0,
+      "agricultural_avg_tariff": 34.0,
+      "non_agricultural_avg_tariff": 13.0
+    },
+    "India_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "United Kingdom": {
+    "US_to_United_Kingdom": {
+      "total_avg_tariff": 5.5,
+      "agricultural_avg_tariff": 15.0,
+      "non_agricultural_avg_tariff": 4.0
+    },
+    "United_Kingdom_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Taiwan": {
+    "US_to_Taiwan": {
+      "total_avg_tariff": 6.3,
+      "agricultural_avg_tariff": 15.1,
+      "non_agricultural_avg_tariff": 4.1
+    },
+    "Taiwan_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Vietnam": {
+    "US_to_Vietnam": {
+      "total_avg_tariff": 9.6,
+      "agricultural_avg_tariff": 16.0,
+      "non_agricultural_avg_tariff": 5.3
+    },
+    "Vietnam_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Netherlands": {
+    "US_to_Netherlands": {
+      "total_avg_tariff": 5.5,
+      "agricultural_avg_tariff": 13.7,
+      "non_agricultural_avg_tariff": 4.2
+    },
+    "Netherlands_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Ireland": {
+    "US_to_Ireland": {
+      "total_avg_tariff": 5.5,
+      "agricultural_avg_tariff": 13.7,
+      "non_agricultural_avg_tariff": 4.2
+    },
+    "Ireland_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Switzerland": {
+    "US_to_Switzerland": {
+      "total_avg_tariff": 6.8,
+      "agricultural_avg_tariff": 35.7,
+      "non_agricultural_avg_tariff": 1.6
+    },
+    "Switzerland_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Italy": {
+    "US_to_Italy": {
+      "total_avg_tariff": 5.5,
+      "agricultural_avg_tariff": 13.7,
+      "non_agricultural_avg_tariff": 4.2
+    },
+    "Italy_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "France": {
+    "US_to_France": {
+      "total_avg_tariff": 5.5,
+      "agricultural_avg_tariff": 13.7,
+      "non_agricultural_avg_tariff": 4.2
+    },
+    "France_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Brazil": {
+    "US_to_Brazil": {
+      "total_avg_tariff": 13.5,
+      "agricultural_avg_tariff": 10.1,
+      "non_agricultural_avg_tariff": 13.9
+    },
+    "Brazil_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Malaysia": {
+    "US_to_Malaysia": {
+      "total_avg_tariff": 3.6,
+      "agricultural_avg_tariff": 7.2,
+      "non_agricultural_avg_tariff": 2.9
+    },
+    "Malaysia_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Singapore": {
+    "US_to_Singapore": {
+      "total_avg_tariff": 0.0,
+      "agricultural_avg_tariff": 0.0,
+      "non_agricultural_avg_tariff": 0.0
+    },
+    "Singapore_to_US": {
+      "total_avg_tariff": 0.0,
+      "agricultural_avg_tariff": 0.0,
+      "non_agricultural_avg_tariff": 0.0
+    }
+  },
+  "Thailand": {
+    "US_to_Thailand": {
+      "total_avg_tariff": 9.9,
+      "agricultural_avg_tariff": 25.1,
+      "non_agricultural_avg_tariff": 7.2
+    },
+    "Thailand_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  },
+  "Belgium": {
+    "US_to_Belgium": {
+      "total_avg_tariff": 5.5,
+      "agricultural_avg_tariff": 13.7,
+      "non_agricultural_avg_tariff": 4.2
+    },
+    "Belgium_to_US": {
+      "total_avg_tariff": 3.4,
+      "agricultural_avg_tariff": 4.7,
+      "non_agricultural_avg_tariff": 3.1
+    }
+  }
+}
