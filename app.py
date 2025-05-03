@@ -85,5 +85,9 @@ app.layout = html.Div([
 # Create server variable for Gunicorn
 server = app.server
 
+# Make the server callable
+def create_app():
+    return app.server
+
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 8050))) 
