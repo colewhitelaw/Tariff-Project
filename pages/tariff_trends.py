@@ -1059,8 +1059,12 @@ def update_import_share_explanation(selected_countries):
 )
 def update_treemap(selected_year):
     try:
+        # Filter data for selected year
         filtered_df = product_group_df[product_group_df['Year'] == selected_year].copy()
-        if filtered_df.empty or filtered_df['Percent of Imports'].sum() == 0:
+        
+        # Check if we have data
+        if filtered_df.empty:
+            # Create empty figure with message
             fig = go.Figure()
             fig.add_annotation(
                 text=f"No import data available for {selected_year}",
@@ -1079,6 +1083,8 @@ def update_treemap(selected_year):
             stats_html = html.Div("No data available for the selected year", 
                                 style={'textAlign': 'center', 'padding': '50px', 'color': colors['dark_blue'], 'fontSize': '24px'})
             return fig, stats_html
+        
+        # Add category if it doesn't exist
         if 'Category' not in filtered_df.columns:
             product_categories = {
                 'Agricultural': ['Live animals and meat', 'Dairy products', 'Fruits and vegetables', 
@@ -1098,154 +1104,138 @@ def update_treemap(selected_year):
                         return category
                 return 'Other'
             filtered_df['Category'] = filtered_df['Product Group'].apply(assign_category)
-        min_value = 0.001
-        filtered_df['Percent for Treemap'] = filtered_df['Percent of Imports'].apply(lambda x: max(x, min_value))
-        has_tariff_rates = all(col in filtered_df.columns for col in ['MFN Average Tariff Rate', 'Final Bound Average Tariff Rate'])
-        root_label = "US Imports"
-        categories = filtered_df['Category'].unique().tolist()
-        # Build category label mapping
-        category_label_map = {}
-        for cat in categories:
-            label = f"{cat} ({filtered_df[filtered_df['Category'] == cat]['Percent of Imports'].sum():.1f}%)"
-            category_label_map[cat] = label
-        # Build node lists
-        nodes = []
-        # Root node
-        nodes.append({'label': root_label, 'parent': '', 'value': None, 'color': None, 'customdata': None, 'text': ''})
-        # Category nodes
-        for cat in categories:
-            nodes.append({'label': category_label_map[cat], 'parent': root_label, 'value': None, 'color': None, 'customdata': None, 'text': ''})
-        # Product group nodes
-        for _, row in filtered_df.iterrows():
-            cat_label = category_label_map[row['Category']]
-            value = max(row['Percent of Imports'], 0.001)
-            color = row['Percent of Imports']
-            text = f"{row['Percent of Imports']:.1f}%"
-            if has_tariff_rates:
-                customdata = [row['MFN Average Tariff Rate'], row['Final Bound Average Tariff Rate']]
-            else:
-                customdata = [None, None]
-            nodes.append({'label': row['Product Group'], 'parent': cat_label, 'value': value, 'color': color, 'customdata': customdata, 'text': text})
-        # Extract arrays
-        labels = [n['label'] for n in nodes]
-        parents = [n['parent'] for n in nodes]
-        values = [n['value'] for n in nodes]
-        colors_arr = [n['color'] for n in nodes]
-        customdata_arr = [n['customdata'] for n in nodes]
-        text_arr = [n['text'] for n in nodes]
-        hovertemplate_arr = []
-        for n in nodes:
-            if n['parent'] == root_label:
-                hovertemplate_arr.append('<b>%{label}</b><extra></extra>')
-            elif n['parent'] in category_label_map.values():
-                if has_tariff_rates:
-                    hovertemplate_arr.append("<b>%{label}</b><br>Import: %{text}<br>MFN Tariff: %{customdata[0]:.1f}%<br>Bound Tariff: %{customdata[1]:.1f}%<extra></extra>")
-                else:
-                    hovertemplate_arr.append("<b>%{label}</b><br>Import: %{text}<extra></extra>")
-            else:
-                hovertemplate_arr.append('<b>%{label}</b><extra></extra>')
-        fig = go.Figure(go.Treemap(
-            labels=labels,
-            parents=parents,
-            values=values,
-            text=text_arr,
-            textinfo="label+text",
-            hovertemplate=hovertemplate_arr,
-            customdata=customdata_arr,
-            marker=dict(
-                colors=colors_arr,
-                colorscale=[
-                    [0, '#b3d1f7'],
-                    [0.08, '#7ec3f5'],
-                    [0.18, '#63b3ed'],
-                    [0.33, '#4299e1'],
-                    [0.66, '#3182ce'],
-                    [1, '#2c5282']
-                ],
-                line=dict(width=3, color='white')
-            ),
-            textfont=dict(
-                family='Roboto',
-                size=20,
-                color='white'
-            ),
-            branchvalues='total'
-        ))
+        
+        # Create basic treemap
+        fig = px.treemap(
+            filtered_df,
+            path=['Category', 'Product Group'],
+            values='Percent of Imports',
+            color='Percent of Imports',
+            color_continuous_scale='Blues',
+            hover_data={
+                'Percent of Imports': ':.1f%'
+            },
+            custom_data=['Percent of Imports'],
+            title=f'US Import Distribution by Product Group ({selected_year})'
+        )
+        
+        # Set hovertemplate to only show percentage of imports
+        fig.update_traces(
+            hovertemplate='<b>%{label}</b><br>%{customdata[0]:.1f}%<extra></extra>'
+        )
+        
+        # Update layout
         fig.update_layout(
-            title=f'US Import Distribution by Product Group ({selected_year})',
             margin=dict(t=60, l=25, r=25, b=25),
+            coloraxis_showscale=False,
             title_font=dict(size=24, color='#ffffff', family='Roboto'),
             paper_bgcolor='#212529',
-            separators='.',
             font=dict(family='Roboto', size=14, color='#ffffff')
         )
+        
+        # Statistics for tables
         top_categories = filtered_df.groupby('Category')['Percent of Imports'].sum().sort_values(ascending=False)
         top_products = filtered_df.sort_values('Percent of Imports', ascending=False).head(5)
+        
+        # Styling for tables
         table_header_style = {
-            'backgroundColor': colors['dark_blue'], 
+            'backgroundColor': '#2c5282',  # Darker blue header
             'color': 'white', 
             'fontWeight': 'bold', 
-            'padding': '15px',
-            'fontSize': '20px'
+            'padding': '16px 20px',  # More padding
+            'fontSize': '18px',
+            'borderBottom': '2px solid #90cdf4',  # Light blue border
+            'textAlign': 'left'
         }
         table_cell_style = {
-            'padding': '12px', 
-            'border': f'1px solid {colors["medium_blue"]}',
-            'fontSize': '18px'
+            'padding': '14px 20px',  # More padding
+            'fontSize': '16px',
+            'color': '#e2e8f0',  # Light blue-gray text
+            'borderBottom': '1px solid #4a5568',  # Darker divider line
+            'backgroundColor': '#1a202c',  # Slightly lighter than background
+            'transition': 'background-color 0.2s'  # For hover effect
         }
         percent_cell_style = {
-            'padding': '12px', 
-            'border': f'1px solid {colors["medium_blue"]}',
-            'fontSize': '22px',
+            'padding': '14px 20px',  # More padding
+            'fontSize': '18px',
             'fontWeight': 'bold',
-            'color': colors['dark_blue']
+            'color': '#63b3ed',  # Bright blue
+            'borderBottom': '1px solid #4a5568',  # Darker divider line
+            'backgroundColor': '#1a202c',  # Slightly lighter than background
+            'textAlign': 'right',
+            'transition': 'background-color 0.2s'  # For hover effect
         }
         table_style = {
             'width': '100%', 
-            'borderCollapse': 'collapse', 
-            'boxShadow': '0 2px 4px rgba(0, 0, 0, 0.1)'
+            'borderCollapse': 'separate',
+            'borderSpacing': '0',
+            'backgroundColor': '#1a202c',  # Slightly lighter than background
+            'borderRadius': '8px',
+            'overflow': 'hidden',
+            'boxShadow': '0 4px 12px rgba(0, 0, 0, 0.3)'  # More pronounced shadow
         }
+        
+        # Create statistics HTML with hover effects
         stats_html = [
             html.Div([
                 html.Div([
-                    html.H4("Top Import Categories", style={'color': colors['dark_blue'], 'fontSize': '24px', 'fontWeight': 'bold'}),
+                    html.H4("Top Import Categories", style={
+                        'color': 'white', 
+                        'fontSize': '22px', 
+                        'fontWeight': 'bold',
+                        'marginBottom': '15px',
+                        'borderLeft': '4px solid #3182ce',  # Left border accent
+                        'paddingLeft': '10px'
+                    }),
                     html.Table([
                         html.Thead(html.Tr([
                             html.Th("Category", style=table_header_style), 
-                            html.Th("% of Imports", style=table_header_style)
+                            html.Th("% of Imports", style={**table_header_style, 'textAlign': 'right'})
                         ])),
                         html.Tbody([
                             html.Tr([
                                 html.Td(category, style=table_cell_style), 
                                 html.Td(f"{value:.1f}%".replace(',', '.'), style=percent_cell_style)
-                            ])
+                            ], style={'hover': {'backgroundColor': '#2d3748'}})  # Hover style
                             for category, value in top_categories.items()
                         ])
                     ], style=table_style)
                 ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top'}),
+                
                 html.Div([
-                    html.H4("Top 5 Product Groups", style={'color': colors['dark_blue'], 'fontSize': '24px', 'fontWeight': 'bold'}),
+                    html.H4("Top 5 Product Groups", style={
+                        'color': 'white', 
+                        'fontSize': '22px', 
+                        'fontWeight': 'bold',
+                        'marginBottom': '15px',
+                        'borderLeft': '4px solid #3182ce',  # Left border accent
+                        'paddingLeft': '10px'
+                    }),
                     html.Table([
                         html.Thead(html.Tr([
                             html.Th("Product Group", style=table_header_style), 
-                            html.Th("% of Imports", style=table_header_style)
+                            html.Th("% of Imports", style={**table_header_style, 'textAlign': 'right'})
                         ])),
                         html.Tbody([
                             html.Tr([
                                 html.Td(row['Product Group'], style=table_cell_style), 
                                 html.Td(f"{row['Percent of Imports']:.1f}%".replace(',', '.'), style=percent_cell_style)
-                            ])
+                            ], style={'hover': {'backgroundColor': '#2d3748'}})  # Hover style
                             for _, row in top_products.iterrows()
                         ])
                     ], style=table_style)
                 ], style={'width': '48%', 'display': 'inline-block', 'verticalAlign': 'top', 'marginLeft': '4%'})
-            ])
+            ], style={'padding': '15px 0'})
         ]
+        
         return fig, stats_html
+        
     except Exception as e:
         import traceback
         print(f"Error in update_treemap: {str(e)}")
         print(traceback.format_exc())
+        
+        # Create error figure
         fig = go.Figure()
         fig.add_annotation(
             text=f"Error creating treemap: {str(e)}",
@@ -1259,10 +1249,13 @@ def update_treemap(selected_year):
             plot_bgcolor='rgba(45, 45, 45, 0.5)',
             paper_bgcolor=colors['card']
         )
+        
+        # Error message for stats
         stats_html = html.Div(
             f"Error processing data: {str(e)}",
             style={'textAlign': 'center', 'padding': '50px', 'color': 'red', 'fontSize': '20px'}
         )
+        
         return fig, stats_html
 
 # Add treemap explanation callback if needed
